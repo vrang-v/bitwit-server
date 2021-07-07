@@ -1,6 +1,5 @@
 package com.server.bitwit.dto.response;
 
-import com.server.bitwit.domain.Ballot;
 import com.server.bitwit.domain.Stock;
 import com.server.bitwit.domain.Vote;
 import lombok.Data;
@@ -8,6 +7,7 @@ import lombok.Data;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class VoteResponse
@@ -16,7 +16,7 @@ public class VoteResponse
     
     Stock stock;
     
-    List<Ballot> ballots;
+    List<BallotResponse> ballots;
     
     String description;
     
@@ -33,12 +33,14 @@ public class VoteResponse
         var response = new VoteResponse( );
         response.id          = vote.getId( );
         response.stock       = vote.getStock( );
-        response.ballots     = vote.getBallots( );
         response.description = vote.getDescription( );
         response.startAt     = vote.getStartAt( );
         response.endedAt     = vote.getEndedAt( );
         response.createdAt   = vote.getCreatedAt( );
         response.updatedAt   = vote.getUpdatedAt( );
+        response.ballots     = vote.getBallots( ).stream( )
+                                   .map(BallotResponse::fromBallot)
+                                   .collect(Collectors.toList( ));
         return response;
     }
 }

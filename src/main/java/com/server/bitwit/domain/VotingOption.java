@@ -1,6 +1,16 @@
 package com.server.bitwit.domain;
 
+import lombok.Getter;
+
+@Getter
 public enum VotingOption
 {
-    INCREMENT, DECREMENT
+    INCREMENT("increment"), DECREMENT("decrement");
+    
+    private final String option;
+    
+    VotingOption(String option)
+    {
+        this.option = option;
+    }
 }

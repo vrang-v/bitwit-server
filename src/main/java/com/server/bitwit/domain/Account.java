@@ -27,4 +27,20 @@ public class Account extends BaseTimeEntity
     String email;
     
     String password;
+    
+    public static Account createAccount(String name, String email, String password)
+    {
+        var account = new Account( );
+        account.name     = name;
+        account.email    = email;
+        account.password = password;
+        return account;
+    }
+    
+    public static Account onlyId(Long id)
+    {
+        var account = new Account( );
+        account.id = id;
+        return account;
+    }
 }

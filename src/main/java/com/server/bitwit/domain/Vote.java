@@ -3,11 +3,8 @@ package com.server.bitwit.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +19,13 @@ import static lombok.AccessLevel.PROTECTED;
 public class Vote extends BaseTimeEntity
 {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "voting_id")
+    @Column(name = "vote_id")
     Long id;
     
     @ManyToOne
     Stock stock;
     
-    @OneToMany
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL)
     List<Ballot> ballots;
     
     @Lob
@@ -54,5 +51,11 @@ public class Vote extends BaseTimeEntity
         vote.startAt     = startAt;
         vote.endedAt     = endedAt;
         return vote;
+    }
+    
+    public Vote addBallot(Ballot ballot)
+    {
+        ballots.add(ballot);
+        return this;
     }
 }

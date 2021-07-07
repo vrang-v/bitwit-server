@@ -37,4 +37,9 @@ public class VoteService
                              .map(VoteResponse::fromVote)
                              .collect(Collectors.toList( ));
     }
+    
+    public boolean existsById(Long voteId)
+    {
+        return voteRepository.existsById(voteId);
+    }
 }

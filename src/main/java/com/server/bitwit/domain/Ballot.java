@@ -3,11 +3,8 @@ package com.server.bitwit.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -26,6 +23,9 @@ public class Ballot extends BaseTimeEntity
     
     @ManyToOne(fetch = LAZY)
     Account account;
+    
+    @ManyToOne(fetch = LAZY)
+    Vote vote;
     
     @Enumerated(STRING)
     VotingOption votingOption;
