@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class StockRequest
 {
-    @NotBlank
+    @NotBlank(message = "이름은 비어있을 수 없습니다.")
     private String name;
     
     public Stock toStock( )

@@ -7,6 +7,12 @@ public class BitwitException extends RuntimeException
 {
     private final ErrorCode errorCode;
     
+    public BitwitException( )
+    {
+        super(ErrorCode.DEFAULT.getBaseMessage( ));
+        this.errorCode = ErrorCode.DEFAULT;
+    }
+    
     public BitwitException(ErrorCode errorCode)
     {
         super(errorCode.getBaseMessage( ));
