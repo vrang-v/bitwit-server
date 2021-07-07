@@ -17,8 +17,8 @@ public class StockController
 {
     private final StockService stockService;
     
-    @ResponseStatus(CREATED)
     @PostMapping
+    @ResponseStatus(CREATED)
     public void createStock(@Valid @RequestBody StockRequest request)
     {
         stockService.createStock(request);
