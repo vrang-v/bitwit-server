@@ -16,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class Stock
+public class Stock extends BaseTimeEntity
 {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "stock_id")

@@ -18,7 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class Ballot
+public class Ballot extends BaseTimeEntity
 {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "voter_id")
@@ -30,9 +30,12 @@ public class Ballot
     @Enumerated(STRING)
     VotingOption votingOption;
     
-    @CreatedDate
-    Instant createdAt;
-    
-    @LastModifiedDate
-    Instant updatedAt;
+    public static Ballot createBallot(Account account, Vote vote, VotingOption votingOption)
+    {
+        var ballot = new Ballot( );
+        ballot.account      = account;
+        ballot.vote         = vote;
+        ballot.votingOption = votingOption;
+        return ballot;
+    }
 }

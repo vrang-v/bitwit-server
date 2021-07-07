@@ -19,7 +19,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class Vote
+public class Vote extends BaseTimeEntity
 {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "voting_id")
@@ -37,12 +37,6 @@ public class Vote
     LocalDateTime startAt;
     
     LocalDateTime endedAt;
-    
-    @CreatedDate
-    Instant createdAt;
-    
-    @LastModifiedDate
-    Instant updatedAt;
     
     public static Vote onlyId(Long id)
     {
