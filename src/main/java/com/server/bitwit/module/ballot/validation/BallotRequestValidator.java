@@ -1,4 +1,4 @@
-package com.server.bitwit.module.ballot.validator;
+package com.server.bitwit.module.ballot.validation;
 
 import com.server.bitwit.module.ballot.dto.BallotRequest;
 import com.server.bitwit.module.account.dto.AccountResponse;
