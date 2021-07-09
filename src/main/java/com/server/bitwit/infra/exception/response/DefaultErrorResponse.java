@@ -1,5 +1,6 @@
-package com.server.bitwit.infra.exception;
+package com.server.bitwit.infra.exception.response;
 
+import com.server.bitwit.infra.exception.BitwitException;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.Instant;
 
 @Data
-public class ErrorResponse
+public class DefaultErrorResponse implements BitwitErrorResponse
 {
     private String code;
     
@@ -17,16 +18,16 @@ public class ErrorResponse
     
     private Instant timestamp = Instant.now( );
     
-    public static ErrorResponse createErrorResponse(BitwitException e)
+    public static BitwitErrorResponse createErrorResponse(BitwitException e)
     {
-        var response = new ErrorResponse( );
+        var response = new DefaultErrorResponse( );
         response.code       = e.getErrorCode( ).getCode( );
         response.message    = e.getMessage( );
         response.httpStatus = e.getErrorCode( ).getHttpStatus( );
         return response;
     }
     
-    public static ResponseEntity<ErrorResponse> createErrorResponseEntity(BitwitException e)
+    public static ResponseEntity<BitwitErrorResponse> createErrorResponseEntity(BitwitException e)
     {
         var errorResponse = createErrorResponse(e);
         return ResponseEntity.status(e.getErrorCode( ).getHttpStatus( ))
