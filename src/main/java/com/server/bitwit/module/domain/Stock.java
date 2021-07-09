@@ -1,5 +1,6 @@
 package com.server.bitwit.module.domain;
 
+import com.server.bitwit.module.common.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,13 +24,6 @@ public class Stock extends BaseTimeEntity
     Long id;
     
     String name;
-    
-    public static Stock onlyId(Long id)
-    {
-        var stock = new Stock( );
-        stock.id = id;
-        return stock;
-    }
     
     public static Stock createStock(String name)
     {
