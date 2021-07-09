@@ -1,4 +1,4 @@
-package com.server.bitwit.module.domain;
+package com.server.bitwit.module.common;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
