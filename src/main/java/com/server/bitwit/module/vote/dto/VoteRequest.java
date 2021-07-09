@@ -2,13 +2,17 @@ package com.server.bitwit.module.vote.dto;
 
 import com.server.bitwit.module.domain.Stock;
 import com.server.bitwit.module.domain.Vote;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class VoteRequest
 {
     @NotNull
@@ -23,9 +27,8 @@ public class VoteRequest
     @NotNull
     LocalDateTime endedAt;
     
-    public Vote toVote( )
+    public Vote toVote(Stock stock)
     {
-        var stock = Stock.onlyId(stockId);
         return Vote.createVote(stock, description, startAt, endedAt);
     }
 }

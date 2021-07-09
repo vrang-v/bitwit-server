@@ -1,12 +1,16 @@
 package com.server.bitwit.module.account.dto;
 
 import com.server.bitwit.module.domain.Account;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountRequest
 {
     @NotBlank

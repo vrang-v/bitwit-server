@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BallotRequest
+public class UpdateBallotRequest
 {
     @NotNull
     Long accountId;
