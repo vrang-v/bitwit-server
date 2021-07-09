@@ -1,4 +1,4 @@
-package com.server.bitwit.infra.formatter;
+package com.server.bitwit.module.common.formatter;
 
 import com.server.bitwit.module.vote.dto.VoteResponseType;
 import org.springframework.format.Formatter;

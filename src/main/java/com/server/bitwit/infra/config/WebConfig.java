@@ -1,6 +1,6 @@
 package com.server.bitwit.infra.config;
 
-import com.server.bitwit.infra.formatter.VoteResponseTypeFormatter;
+import com.server.bitwit.module.common.formatter.VoteResponseTypeFormatter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
