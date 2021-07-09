@@ -1,4 +1,4 @@
-package com.server.bitwit.modle.stock;
+package com.server.bitwit.module.stock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.bitwit.module.stock.StockService;
