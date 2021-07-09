@@ -1,5 +1,7 @@
 package com.server.bitwit.module.vote;
 
+import com.server.bitwit.module.common.BitwitResponse;
+import com.server.bitwit.module.common.SimpleIdResponse;
 import com.server.bitwit.module.vote.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,10 @@ public class VoteController
     
     @PostMapping
     @ResponseStatus(CREATED)
-    public void createVote(@Valid @RequestBody VoteRequest voteRequest)
+    public BitwitResponse createVote(@Valid @RequestBody VoteRequest voteRequest)
     {
-        voteService.createVote(voteRequest);
+        var voteId = voteService.createVote(voteRequest);
+        return SimpleIdResponse.of(voteId);
     }
     
     @GetMapping("/{voteId}")
