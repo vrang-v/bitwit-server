@@ -1,5 +1,6 @@
 package com.server.bitwit.module.domain;
 
+import com.server.bitwit.module.common.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,6 +37,24 @@ public class Ballot extends BaseTimeEntity
         ballot.account      = account;
         ballot.vote         = vote;
         ballot.votingOption = votingOption;
+        vote.addBallot(votingOption);
         return ballot;
+    }
+    
+    public Ballot update(VotingOption votingOption)
+    {
+        var previousSelection = this.votingOption;
+        if (previousSelection == votingOption) {
+            return this;
+        }
+        this.votingOption = votingOption;
+        vote.changeBallot(previousSelection, votingOption);
+        return this;
+    }
+    
+    public Ballot delete( )
+    {
+        vote.removeBallot(this.votingOption);
+        return this;
     }
 }
