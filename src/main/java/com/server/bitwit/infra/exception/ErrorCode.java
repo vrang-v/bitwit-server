@@ -11,7 +11,9 @@ public enum ErrorCode
 {
     DEFAULT("C1000", "Default Bitwit Error", BAD_REQUEST),
     
-    RESOURCE_NOT_FOUND("C404", "Resource Not Found", NOT_FOUND);
+    RESOURCE_NOT_FOUND("C404", "Resource Not Found", NOT_FOUND),
+    
+    FIELD_ERROR("C843", "잘못된 요청 값", BAD_REQUEST);
     
     
     private final String code;
