@@ -1,7 +1,6 @@
 package com.server.bitwit.module.vote;
 
-import com.server.bitwit.module.vote.dto.VoteRequest;
-import com.server.bitwit.module.vote.dto.VoteResponse;
+import com.server.bitwit.module.vote.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +26,24 @@ public class VoteController
     @GetMapping("/{voteId}")
     public VoteResponse getVote(@PathVariable Long voteId)
     {
-        return voteService.getVote(voteId);
+        return voteService.getVoteResponse(voteId);
+    }
+    
+    @GetMapping("/{voteId}/type/{responseType}")
+    public VoteResponse getVote(@PathVariable Long voteId, @PathVariable VoteResponseType responseType)
+    {
+        return voteService.getVoteResponse(voteId, responseType);
     }
     
     @GetMapping
     public List<VoteResponse> getVotes( )
     {
-        return voteService.getAllVotes( );
+        return voteService.getAllVoteResponses( );
+    }
+    
+    @GetMapping("/type/{responseType}")
+    public List<VoteResponse> getVotes(@PathVariable VoteResponseType responseType)
+    {
+        return voteService.getAllVoteResponses(responseType);
     }
 }

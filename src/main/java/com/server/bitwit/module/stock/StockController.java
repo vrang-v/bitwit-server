@@ -26,6 +26,6 @@ public class StockController
     @GetMapping("/{stockId}")
     public StockResponse getStock(@PathVariable Long stockId)
     {
-        return stockService.getStock(stockId);
+        return stockService.getStockResponse(stockId);
     }
 }

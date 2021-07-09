@@ -1,6 +1,8 @@
 package com.server.bitwit.module.ballot;
 
 import com.server.bitwit.module.ballot.dto.BallotRequest;
+import com.server.bitwit.module.ballot.dto.UpdateBallotRequest;
+import com.server.bitwit.module.common.BitwitResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +19,20 @@ public class BallotController
     
     @PostMapping
     @ResponseStatus(CREATED)
-    public Long createBallot(@Valid @RequestBody BallotRequest ballotRequest)
+    public BitwitResponse createBallot(@Valid @RequestBody BallotRequest request)
     {
-        return ballotService.createBallot(ballotRequest);
+        return ballotService.createBallot(request);
+    }
+    
+    @PatchMapping("/{ballotId}")
+    public void updateBallot(@PathVariable Long ballotId, @Valid @RequestBody UpdateBallotRequest request)
+    {
+        ballotService.updateBallot(ballotId, request);
+    }
+    
+    @DeleteMapping("/{ballotId}")
+    public void deleteBallot(@PathVariable Long ballotId)
+    {
+        ballotService.deleteBallot(ballotId);
     }
 }
