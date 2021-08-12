@@ -1,38 +1,25 @@
 package com.server.bitwit.module.ballot;
 
-import com.server.bitwit.module.ballot.dto.BallotRequest;
-import com.server.bitwit.module.ballot.dto.UpdateBallotRequest;
-import com.server.bitwit.module.common.BitwitResponse;
+import com.server.bitwit.module.ballot.dto.CreateOrChangeBallotRequest;
+import com.server.bitwit.module.common.dto.BitwitResponse;
+import com.server.bitwit.module.security.jwt.Jwt;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static org.springframework.http.HttpStatus.CREATED;
-
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/ballots")
-public class BallotController
-{
+@RequestMapping("/api/v1/ballots")
+public class BallotController {
+    
     private final BallotService ballotService;
     
     @PostMapping
-    @ResponseStatus(CREATED)
-    public BitwitResponse createBallot(@Valid @RequestBody BallotRequest request)
-    {
-        return ballotService.createBallot(request);
-    }
-    
-    @PatchMapping("/{ballotId}")
-    public void updateBallot(@PathVariable Long ballotId, @Valid @RequestBody UpdateBallotRequest request)
-    {
-        ballotService.updateBallot(ballotId, request);
-    }
-    
-    @DeleteMapping("/{ballotId}")
-    public void deleteBallot(@PathVariable Long ballotId)
-    {
-        ballotService.deleteBallot(ballotId);
+    public BitwitResponse createOrChangeBallot(@Jwt Long accountId, @Valid @RequestBody CreateOrChangeBallotRequest request) {
+        return ballotService.createOrChangeBallot(accountId, request);
     }
 }

@@ -1,17 +1,17 @@
 package com.server.bitwit.module.ballot;
 
-import com.server.bitwit.infra.exception.NotFoundException;
 import com.server.bitwit.module.account.AccountService;
-import com.server.bitwit.module.ballot.dto.BallotRequest;
-import com.server.bitwit.module.ballot.dto.UpdateBallotRequest;
-import com.server.bitwit.module.common.BitwitResponse;
-import com.server.bitwit.module.common.SimpleIdResponse;
-import com.server.bitwit.module.domain.Ballot;
+import com.server.bitwit.module.ballot.dto.CreateOrChangeBallotRequest;
+import com.server.bitwit.module.common.dto.BitwitResponse;
+import com.server.bitwit.module.common.dto.SimpleIdResponse;
+import com.server.bitwit.domain.Ballot;
 import com.server.bitwit.module.vote.VoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,31 +25,34 @@ public class BallotService
     private final VoteService    voteService;
     
     @Transactional
-    public BitwitResponse createBallot(BallotRequest ballotRequest)
-    {
-        var account  = accountService.getAccount(ballotRequest.getAccountId( )).orElseThrow( );
-        var vote     = voteService.getVote(ballotRequest.getVoteId( )).orElseThrow( );
-        var ballot   = Ballot.createBallot(account, vote, ballotRequest.getVotingOption( ));
-        var ballotId = ballotRepository.save(ballot).getId( );
-        return SimpleIdResponse.of(ballotId);
+    public BitwitResponse createOrChangeBallot(Long accountId, CreateOrChangeBallotRequest request) {
+        AtomicLong ballotId = new AtomicLong(- 1);
+        ballotRepository.findByVoteAndAccountId(accountId, request.getVoteId( ))
+                        .ifPresentOrElse(
+                                ballot -> {
+                                    var votingOption = ballot.getVotingOption( );
+                                    if (votingOption == request.getVotingOption( )) {
+                                        ballot.delete( );
+                                        ballotRepository.delete(ballot);
+                                    }
+                                    else {
+                                        ballot.update(request.getVotingOption( ));
+                                    }
+                                    ballotId.set(ballot.getId( ));
+                                },
+                                ( ) -> ballotId.set(createBallot(accountId, request))
+                        );
+        return SimpleIdResponse.of(ballotId.get( ));
     }
     
-    @Transactional
-    public void updateBallot(Long ballotId, UpdateBallotRequest request)
-    {
-        ballotRepository.findById(ballotId).orElseThrow(NotFoundException::new)
-                        .update(request.getVotingOption( ));
+    private Long createBallot(Long accountId, CreateOrChangeBallotRequest request) {
+        var account = accountService.getAccount(accountId).orElseThrow( );
+        var vote    = voteService.findById(request.getVoteId( )).orElseThrow( );
+        var ballot  = Ballot.createBallot(account, vote, request.getVotingOption( ));
+        return ballotRepository.save(ballot).getId( );
     }
     
-    @Transactional
-    public void deleteBallot(Long ballotId)
-    {
-        var ballot = ballotRepository.findById(ballotId).orElseThrow(NotFoundException::new).delete( );
-        ballotRepository.delete(ballot);
-    }
-    
-    public boolean existBallotId(Long ballotId)
-    {
+    public boolean existsById(Long ballotId) {
         return ballotRepository.existsById(ballotId);
     }
 }

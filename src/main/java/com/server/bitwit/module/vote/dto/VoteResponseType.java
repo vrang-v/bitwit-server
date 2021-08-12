@@ -1,6 +1,6 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.module.domain.Vote;
+import com.server.bitwit.domain.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.convert.converter.Converter;
@@ -14,8 +14,8 @@ import java.util.Map;
 public enum VoteResponseType
 {
     DEFAULT("default", VoteDefaultResponse::fromVote),
-    
-    MIN("min", VoteMinResponse::fromVote);
+    MIN("min", VoteMinResponse::fromVote),
+    CLIENT("client", VoteClientResponse::fromVote);
     
     private static final Map<String, VoteResponseType> INSTANCE_STORAGE;
     

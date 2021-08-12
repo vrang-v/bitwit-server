@@ -2,9 +2,9 @@ package com.server.bitwit.module.ballot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.bitwit.module.account.AccountService;
-import com.server.bitwit.module.account.dto.AccountRequest;
-import com.server.bitwit.module.ballot.dto.BallotRequest;
-import com.server.bitwit.module.domain.VotingOption;
+import com.server.bitwit.module.account.dto.CreateAccountRequest;
+import com.server.bitwit.module.ballot.dto.CreateOrChangeBallotRequest;
+import com.server.bitwit.domain.VotingOption;
 import com.server.bitwit.module.stock.StockService;
 import com.server.bitwit.module.stock.dto.StockRequest;
 import org.json.JSONObject;
@@ -38,16 +38,16 @@ class BallotControllerTest
     void createBallot_normal_201( ) throws Exception
     {
         // given
-        var accountId        = accountService.createAccount(new AccountRequest("NAME", "email@a.com", "plainpassword"));
+        var accountId        = accountService.createAccount(new CreateAccountRequest("NAME", "email@a.com", "plainpassword"));
         var stockId          = stockService.createStock(new StockRequest("AAPL"));
-        var ballotRequest    = new BallotRequest(accountId, stockId, VotingOption.INCREMENT);
+        var ballotRequest    = new CreateOrChangeBallotRequest(stockId, VotingOption.INCREMENT);
         var expectedResponse = new JSONObject( ).put("id", 1).toString( );
         
         // when, then
         mockMvc.perform(post("/ballots")
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .accept(MediaType.APPLICATION_JSON))
+                                .content(objectMapper.writeValueAsString(ballotRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                .andExpect(status( ).isCreated( ))
                .andExpect(content( ).json(expectedResponse));
     }
@@ -57,14 +57,14 @@ class BallotControllerTest
     void createBallot_nonExistentAccountId_400( ) throws Exception
     {
         // given
-        var stockId          = stockService.createStock(new StockRequest("AAPL"));
-        var ballotRequest    = new BallotRequest(-1L, stockId, VotingOption.INCREMENT);
+        var stockId       = stockService.createStock(new StockRequest("AAPL"));
+        var ballotRequest = new CreateOrChangeBallotRequest(stockId, VotingOption.INCREMENT);
         
         // when, then
         mockMvc.perform(post("/ballots")
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .accept(MediaType.APPLICATION_JSON))
+                                .content(objectMapper.writeValueAsString(ballotRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                .andExpect(status( ).isNotFound( ));
     }
     
@@ -73,14 +73,14 @@ class BallotControllerTest
     void createBallot_nonExistentStockId_400( ) throws Exception
     {
         // given
-        var accountId        = accountService.createAccount(new AccountRequest("NAME", "email@a.com", "plainpassword"));
-        var ballotRequest    = new BallotRequest(accountId, -1L, VotingOption.INCREMENT);
+        var accountId     = accountService.createAccount(new CreateAccountRequest("NAME", "email@a.com", "plainpassword"));
+        var ballotRequest = new CreateOrChangeBallotRequest(- 1L, VotingOption.INCREMENT);
         
         // when, then
         mockMvc.perform(post("/ballots")
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .accept(MediaType.APPLICATION_JSON))
+                                .content(objectMapper.writeValueAsString(ballotRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                .andExpect(status( ).isNotFound( ));
     }
     
@@ -89,16 +89,16 @@ class BallotControllerTest
     void createBallot_duplicateVoting_400( ) throws Exception
     {
         // given
-        var accountId        = accountService.createAccount(new AccountRequest("NAME", "email@a.com", "plainpassword"));
-        var stockId          = stockService.createStock(new StockRequest("AAPL"));
-        var ballotRequest    = new BallotRequest(accountId, stockId, VotingOption.INCREMENT);
-        ballotService.createBallot(ballotRequest);
-    
+        var accountId     = accountService.createAccount(new CreateAccountRequest("NAME", "email@a.com", "plainpassword"));
+        var stockId       = stockService.createStock(new StockRequest("AAPL"));
+        var ballotRequest = new CreateOrChangeBallotRequest(stockId, VotingOption.INCREMENT);
+        ballotService.createBallot(accountId, ballotRequest);
+        
         // when, then
         mockMvc.perform(post("/ballots")
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .accept(MediaType.APPLICATION_JSON))
+                                .content(objectMapper.writeValueAsString(ballotRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                .andExpect(status( ).isBadRequest( ));
     }
 }

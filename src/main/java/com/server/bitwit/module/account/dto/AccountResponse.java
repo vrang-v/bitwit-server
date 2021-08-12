@@ -1,6 +1,6 @@
 package com.server.bitwit.module.account.dto;
 
-import com.server.bitwit.module.domain.Account;
+import com.server.bitwit.domain.Account;
 import lombok.Data;
 
 @Data

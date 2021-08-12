@@ -1,6 +1,6 @@
 package com.server.bitwit.module.vote.validation;
 
-import com.server.bitwit.infra.exception.FieldErrorException;
+import com.server.bitwit.module.error.exception.FieldErrorException;
 import com.server.bitwit.module.stock.StockService;
 import com.server.bitwit.module.vote.dto.VoteRequest;
 import lombok.RequiredArgsConstructor;

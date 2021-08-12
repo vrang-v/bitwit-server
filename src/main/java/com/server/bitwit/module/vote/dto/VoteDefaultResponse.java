@@ -1,9 +1,11 @@
 package com.server.bitwit.module.vote.dto;
 
 import com.server.bitwit.module.ballot.dto.BallotDefaultResponse;
-import com.server.bitwit.module.domain.Stock;
-import com.server.bitwit.module.domain.Vote;
-import com.server.bitwit.module.domain.VotingOption;
+import com.server.bitwit.module.ballot.dto.BallotResponse;
+import com.server.bitwit.domain.Vote;
+import com.server.bitwit.domain.VotingOption;
+import com.server.bitwit.module.stock.dto.StockDefaultResponse;
+import com.server.bitwit.module.stock.dto.StockResponse;
 import lombok.Data;
 
 import java.time.Instant;
@@ -17,9 +19,9 @@ public class VoteDefaultResponse implements VoteResponse
 {
     Long id;
     
-    Stock stock;
+    StockResponse stock;
     
-    List<BallotDefaultResponse> ballots;
+    List<BallotResponse> ballots;
     
     String description;
     
@@ -31,23 +33,23 @@ public class VoteDefaultResponse implements VoteResponse
     
     Instant updatedAt;
     
-    int participantsCount;
+    int participantCount;
     
-    Map<VotingOption, Integer> selectionsCount;
+    Map<VotingOption, Integer> selectionCount;
     
     public static VoteResponse fromVote(Vote vote)
     {
         var response = new VoteDefaultResponse( );
         response.id                = vote.getId( );
-        response.stock             = vote.getStock( );
+        response.stock             = StockDefaultResponse.fromStock(vote.getStock( ));
         response.description       = vote.getDescription( );
         response.startAt           = vote.getStartAt( );
         response.endedAt           = vote.getEndedAt( );
         response.createdAt         = vote.getCreatedAt( );
-        response.updatedAt         = vote.getUpdatedAt( );
-        response.participantsCount = vote.getParticipantsCount( );
-        response.selectionsCount   = vote.getSelectionsCount( );
-        response.ballots           = vote.getBallots( ).stream( )
+        response.updatedAt        = vote.getUpdatedAt( );
+        response.participantCount = vote.getParticipantsCount( );
+        response.selectionCount   = vote.getSelectionCount( );
+        response.ballots          = vote.getBallots( ).stream( )
                                          .map(BallotDefaultResponse::fromBallot)
                                          .collect(Collectors.toList( ));
         return response;

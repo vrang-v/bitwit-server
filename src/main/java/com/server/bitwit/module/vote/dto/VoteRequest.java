@@ -1,7 +1,7 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.module.domain.Stock;
-import com.server.bitwit.module.domain.Vote;
+import com.server.bitwit.domain.Stock;
+import com.server.bitwit.domain.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

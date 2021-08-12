@@ -1,8 +1,8 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.module.domain.Stock;
-import com.server.bitwit.module.domain.Vote;
-import com.server.bitwit.module.domain.VotingOption;
+import com.server.bitwit.domain.Stock;
+import com.server.bitwit.domain.Vote;
+import com.server.bitwit.domain.VotingOption;
 import lombok.Data;
 
 import java.time.Instant;
@@ -26,9 +26,9 @@ public class VoteMinResponse implements VoteResponse
     
     Instant updatedAt;
     
-    int participantsCount;
+    int participantCount;
     
-    Map<VotingOption, Integer> selectionsCount;
+    Map<VotingOption, Integer> selectionCount;
     
     public static VoteMinResponse fromVote(Vote vote)
     {
@@ -39,9 +39,9 @@ public class VoteMinResponse implements VoteResponse
         response.startAt           = vote.getStartAt( );
         response.endedAt           = vote.getEndedAt( );
         response.createdAt         = vote.getCreatedAt( );
-        response.updatedAt         = vote.getUpdatedAt( );
-        response.participantsCount = vote.getParticipantsCount( );
-        response.selectionsCount   = vote.getSelectionsCount( );
+        response.updatedAt        = vote.getUpdatedAt( );
+        response.participantCount = vote.getParticipantsCount( );
+        response.selectionCount   = vote.getSelectionCount( );
         return response;
     }
 }

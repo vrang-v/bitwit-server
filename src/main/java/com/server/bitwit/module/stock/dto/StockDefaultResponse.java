@@ -1,6 +1,6 @@
 package com.server.bitwit.module.stock.dto;
 
-import com.server.bitwit.module.domain.Stock;
+import com.server.bitwit.domain.Stock;
 import lombok.Data;
 
 @Data
@@ -14,7 +14,7 @@ public class StockDefaultResponse implements StockResponse
     {
         var response = new StockDefaultResponse( );
         response.id   = stock.getId( );
-        response.name = stock.getName( );
+        response.name = stock.getFullName( );
         return response;
     }
 }

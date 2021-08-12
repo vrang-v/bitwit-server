@@ -1,13 +1,13 @@
 package com.server.bitwit.module.ballot.dto;
 
 import com.server.bitwit.module.account.dto.AccountResponse;
-import com.server.bitwit.module.domain.Ballot;
-import com.server.bitwit.module.domain.VotingOption;
+import com.server.bitwit.domain.Ballot;
+import com.server.bitwit.domain.VotingOption;
 import lombok.Data;
 
 @Data
-public class BallotDefaultResponse
-{
+public class BallotDefaultResponse implements BallotResponse {
+    
     Long id;
     
     AccountResponse account;
@@ -16,8 +16,7 @@ public class BallotDefaultResponse
     
     VotingOption votingOption;
     
-    public static BallotDefaultResponse fromBallot(Ballot ballot)
-    {
+    public static BallotDefaultResponse fromBallot(Ballot ballot) {
         var response = new BallotDefaultResponse( );
         response.id           = ballot.getId( );
         response.voteId       = ballot.getVote( ).getId( );

@@ -1,10 +1,15 @@
 package com.server.bitwit.module.account;
 
-import com.server.bitwit.module.domain.Account;
+import com.server.bitwit.domain.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
+import java.util.Optional;
+
 public interface AccountRepository extends JpaRepository<Account, Long>
 {
+    Optional<Account> findByName(String name);
+    
+    Optional<Account> findByEmail(String email);
+    
+    boolean existsByEmail(String email);
 }
