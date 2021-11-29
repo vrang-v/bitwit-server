@@ -1,8 +1,8 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.domain.Stock;
-import com.server.bitwit.domain.Vote;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.bitwit.domain.VotingOption;
+import com.server.bitwit.module.stock.dto.StockResponse;
 import lombok.Data;
 
 import java.time.Instant;
@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
-public class VoteMinResponse implements VoteResponse
-{
+public class VoteMinResponse implements VoteResponse {
+    
+    @JsonProperty("voteId")
     Long id;
     
-    Stock stock;
+    StockResponse stock;
     
     String description;
     
@@ -26,22 +27,7 @@ public class VoteMinResponse implements VoteResponse
     
     Instant updatedAt;
     
-    int participantCount;
+    int participantsCount;
     
     Map<VotingOption, Integer> selectionCount;
-    
-    public static VoteMinResponse fromVote(Vote vote)
-    {
-        var response = new VoteMinResponse( );
-        response.id                = vote.getId( );
-        response.stock             = vote.getStock( );
-        response.description       = vote.getDescription( );
-        response.startAt           = vote.getStartAt( );
-        response.endedAt           = vote.getEndedAt( );
-        response.createdAt         = vote.getCreatedAt( );
-        response.updatedAt        = vote.getUpdatedAt( );
-        response.participantCount = vote.getParticipantsCount( );
-        response.selectionCount   = vote.getSelectionCount( );
-        return response;
-    }
 }

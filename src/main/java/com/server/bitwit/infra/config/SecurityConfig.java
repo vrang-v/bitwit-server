@@ -1,17 +1,22 @@
 package com.server.bitwit.infra.config;
 
+import com.server.bitwit.module.security.basic.UsernamePasswordAuthenticationProvider;
+import com.server.bitwit.module.security.google.GoogleLoginAuthenticationProvider;
+import com.server.bitwit.module.security.google.GoogleUserService;
 import com.server.bitwit.module.security.jwt.JwtService;
 import com.server.bitwit.module.security.jwt.support.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -30,7 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private final JwtService jwtService;
     
+    private final UserDetailsService                               userDetailsService;
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService;
+    private final GoogleUserService                                googleUserService;
     
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
     
@@ -49,6 +56,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(new GoogleLoginAuthenticationProvider(googleUserService))
+            .authenticationProvider(new UsernamePasswordAuthenticationProvider(userDetailsService, passwordEncoder( )));
+    }
+    
+    @Override
     public void configure(WebSecurity web) {
         web.ignoring( )
            .antMatchers(
@@ -59,32 +72,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            .requestMatchers(PathRequest.toStaticResources( ).atCommonLocations( ));
     }
     
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors( )
                 .and( )
-                
+            
                 .csrf( ).disable( )
                 .formLogin( ).disable( )
                 .httpBasic( ).disable( )
-                
+            
                 .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
-                
+            
                 .sessionManagement( )
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and( )
-                
+            
                 .authorizeRequests( )
+                .antMatchers("/accounts/**").permitAll( )
                 .antMatchers("/api/**").permitAll( )
-                .antMatchers("/api/v1/accounts/**").permitAll( )
-                .antMatchers("/api/v1/login/**").permitAll( )
                 .anyRequest( ).authenticated( )
                 .and( )
-                
+            
                 .oauth2Login( )
                 .authorizationEndpoint( )
-                .baseUri("/login/oauth2/authorize")
+                .baseUri("/api/resolveIdToken/oauth2/authorize")
                 .authorizationRequestRepository(authorizationRequestRepository)
                 .and( )
                 .userInfoEndpoint( )

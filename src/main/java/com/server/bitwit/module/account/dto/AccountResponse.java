@@ -1,23 +1,23 @@
 package com.server.bitwit.module.account.dto;
 
-import com.server.bitwit.domain.Account;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.bitwit.domain.AccountType;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
-@Data
-public class AccountResponse
-{
+import static lombok.AccessLevel.PRIVATE;
+
+@Data @FieldDefaults(level = PRIVATE)
+public class AccountResponse {
+    
+    @JsonProperty("accountId")
     Long id;
     
     String name;
     
     String email;
     
-    public static AccountResponse fromAccount(Account account)
-    {
-        var response = new AccountResponse( );
-        response.id    = account.getId( );
-        response.name  = account.getName( );
-        response.email = account.getEmail( );
-        return response;
-    }
+    AccountType accountType;
+    
+    boolean emailVerified;
 }

@@ -1,6 +1,7 @@
 package com.server.bitwit.domain;
 
 import com.server.bitwit.module.error.exception.BitwitException;
+import com.server.bitwit.module.error.exception.InvalidRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,7 +34,7 @@ public class Ballot extends BaseTimeEntity {
     
     public static Ballot createBallot(Account account, Vote vote, VotingOption votingOption) {
         if (isAlreadyVotedAccount(vote, account)) {
-            throw new BitwitException("이미 투표에 참여한 계정입니다.");
+            throw new InvalidRequestException("이미 투표에 참여한 계정입니다.");
         }
         var ballot = new Ballot( );
         ballot.account      = account;
@@ -52,16 +53,16 @@ public class Ballot extends BaseTimeEntity {
     }
     
     public Ballot update(VotingOption votingOption) {
-        var previousSelection = this.votingOption;
-        if (previousSelection == votingOption) {
+        var prevOption = this.votingOption;
+        if (prevOption == votingOption) {
             return this;
         }
         this.votingOption = votingOption;
-        vote.changeBallot(previousSelection, votingOption);
+        vote.changeBallot(prevOption, votingOption);
         return this;
     }
     
-    public Ballot delete( ) {
+    public Ballot beforeDeleting( ) {
         vote.removeBallot(this.votingOption);
         return this;
     }

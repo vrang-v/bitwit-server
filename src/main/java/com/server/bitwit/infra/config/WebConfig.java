@@ -1,8 +1,8 @@
 package com.server.bitwit.infra.config;
 
+import com.server.bitwit.module.common.formatter.VoteResponseTypeFormatter;
 import com.server.bitwit.module.common.interceptor.LoggingInterceptor;
 import com.server.bitwit.module.security.jwt.support.JwtArgumentResolver;
-import com.server.bitwit.module.common.formatter.VoteResponseTypeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -19,6 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     
     private final LoggingInterceptor  loggingInterceptor;
     private final JwtArgumentResolver jwtArgumentResolver;
+    
     
     @Override
     public void addCorsMappings(CorsRegistry registry) {

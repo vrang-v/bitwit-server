@@ -1,6 +1,8 @@
 package com.server.bitwit.module.security.jwt;
 
 import com.google.common.net.HttpHeaders;
+import com.server.bitwit.module.error.exception.BitwitException;
+import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.security.AccountPrincipal;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,9 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.stream;
 import static org.springframework.util.StringUtils.hasText;
 
-@Service
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class JwtService {
     
     private final JwtProperties jwtProperties;
@@ -50,12 +52,17 @@ public class JwtService {
     }
     
     public Object extractClaim(String jwt, Claim claim) {
-        return Jwts.parserBuilder( )
-                   .setSigningKey(jwtProperties.getSecretKey( ))
-                   .build( )
-                   .parseClaimsJws(jwt)
-                   .getBody( )
-                   .get(claim.getKey( ), claim.getType( ));
+        try {
+            return Jwts.parserBuilder( )
+                       .setSigningKey(jwtProperties.getSecretKey( ))
+                       .build( )
+                       .parseClaimsJws(jwt)
+                       .getBody( )
+                       .get(claim.getKey( ), claim.getType( ));
+        }
+        catch (Exception e) {
+            throw new BitwitException(ErrorCode.NO_PERMISSION);
+        }
     }
     
     public Authentication extractAuthentication(String jwt) {

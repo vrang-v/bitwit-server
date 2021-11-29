@@ -1,9 +1,7 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.domain.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.core.convert.converter.Converter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,11 +9,12 @@ import java.util.Map;
 
 @Getter
 @AllArgsConstructor
-public enum VoteResponseType
-{
-    DEFAULT("default", VoteDefaultResponse::fromVote),
-    MIN("min", VoteMinResponse::fromVote),
-    CLIENT("client", VoteClientResponse::fromVote);
+public enum VoteResponseType {
+    
+    DEFAULT("default", VoteDefaultResponse.class),
+    MIN("min", VoteMinResponse.class),
+    CLIENT("client", VoteClientResponse.class),
+    VOTE_ITEM("vote-item", VoteItemResponse.class);
     
     private static final Map<String, VoteResponseType> INSTANCE_STORAGE;
     
@@ -26,15 +25,9 @@ public enum VoteResponseType
     }
     
     private final String                        typeName;
-    private final Converter<Vote, VoteResponse> converter;
+    private final Class<? extends VoteResponse> responseType;
     
-    public static VoteResponseType findByTypeName(String typeName)
-    {
+    public static VoteResponseType findByTypeName(String typeName) {
         return INSTANCE_STORAGE.get(typeName);
-    }
-    
-    public VoteResponse fromVote(Vote vote)
-    {
-        return this.converter.convert(vote);
     }
 }

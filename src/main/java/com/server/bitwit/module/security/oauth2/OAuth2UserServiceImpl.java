@@ -47,7 +47,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     }
     
     private Account saveOrUpdate(OAuth2Attributes attributes) {
-        var account = accountRepository.findByEmail(attributes.getEmail( ))
+        var account = accountRepository.findByEmailAndAccountType(attributes.getEmail( ), attributes.getAccountType( ))
                                        .map(_account -> _account.changeName(attributes.getName( )))
                                        .map(_account -> _account.changeEmail(attributes.getEmail( )))
                                        .orElse(attributes.toAccount( ));

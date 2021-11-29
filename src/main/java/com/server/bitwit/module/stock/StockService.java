@@ -2,17 +2,20 @@ package com.server.bitwit.module.stock;
 
 import com.server.bitwit.domain.Stock;
 import com.server.bitwit.module.error.exception.BitwitException;
-import com.server.bitwit.module.error.exception.NotFoundException;
-import com.server.bitwit.module.stock.dto.StockDefaultResponse;
-import com.server.bitwit.module.stock.dto.StockRequest;
+import com.server.bitwit.module.error.exception.NonExistentResourceException;
+import com.server.bitwit.module.stock.dto.CreateStockRequest;
+import com.server.bitwit.module.stock.dto.SearchStockCond;
 import com.server.bitwit.module.stock.dto.StockResponse;
 import com.server.bitwit.module.stock.dto.UpdateRealTimeInfoRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -21,16 +24,27 @@ public class StockService {
     
     private final StockRepository stockRepository;
     
-    @Transactional
-    public Long createStock(StockRequest request) {
-        return stockRepository.save(request.toStock( )).getId( );
+    private final ConversionService conversionService;
+    
+    public StockResponse createStock(CreateStockRequest request) {
+        return Optional.ofNullable(conversionService.convert(request, Stock.class))
+                       .map(stockRepository::save)
+                       .map(stock -> conversionService.convert(stock, StockResponse.class))
+                       .orElseThrow( );
     }
     
     public StockResponse getStockResponse(Long stockId) {
+        return stockRepository.findById(stockId)
+                              .map(stock -> conversionService.convert(stock, StockResponse.class))
+                              .orElseThrow(( ) -> new NonExistentResourceException("stock", stockId));
+    }
+    
+    public List<StockResponse> searchStocks(SearchStockCond cond, Pageable pageable) {
         return stockRepository
-                .findById(stockId)
-                .map(StockDefaultResponse::fromStock)
-                .orElseThrow(( ) -> new NotFoundException("Requested stockId '" + stockId + "'"));
+                .searchStocks(cond)
+                .stream( )
+                .map(stock -> conversionService.convert(stock, StockResponse.class))
+                .collect(Collectors.toList( ));
     }
     
     public Optional<Stock> findById(Long stockId) {

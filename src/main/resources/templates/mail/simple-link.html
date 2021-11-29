@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>비트윗</title>
+</head>
+<body>
+<div>
+    <p>안녕하세요. <span th:text="${nickname}"></span>님</p>
+
+    <h2 th:text="${message}">메시지</h2>
+
+    <div>
+        <a th:href="${host + link}" th:text="${linkName}">Link</a>
+        <p>링크가 동작하지 않는 경우에는 아래 URL을 복사해서 사용하세요.</p>
+        <small th:text="${host + link}"></small>
+    </div>
+</div>
+<footer>
+    <small>&copy; Bitwit.site 2021</small>
+</footer>
+</body>
+</html>

@@ -1,10 +1,9 @@
 package com.server.bitwit.module.vote.dto;
 
-import com.server.bitwit.module.ballot.dto.BallotDefaultResponse;
-import com.server.bitwit.module.ballot.dto.BallotResponse;
-import com.server.bitwit.domain.Stock;
-import com.server.bitwit.domain.Vote;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.bitwit.domain.VotingOption;
+import com.server.bitwit.module.ballot.dto.BallotResponse;
+import com.server.bitwit.module.stock.dto.StockResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,9 +12,10 @@ import java.util.Map;
 @Data
 public class VoteItemResponse implements VoteResponse {
     
+    @JsonProperty("voteId")
     Long id;
     
-    Stock stock;
+    StockResponse stock;
     
     String description;
     
@@ -23,33 +23,9 @@ public class VoteItemResponse implements VoteResponse {
     
     LocalDateTime endedAt;
     
-    int participantCount;
+    int participantsCount;
     
     BallotResponse ballot;
     
     Map<VotingOption, Integer> selectionCount;
-    
-    public static VoteItemResponse fromParticipating(Vote vote) {
-        var response = new VoteItemResponse( );
-        response.id               = vote.getId( );
-        response.stock            = vote.getStock( );
-        response.description      = vote.getDescription( );
-        response.startAt          = vote.getStartAt( );
-        response.endedAt          = vote.getEndedAt( );
-        response.participantCount = vote.getParticipantsCount( );
-        response.selectionCount   = vote.getSelectionCount( );
-        response.ballot           = BallotDefaultResponse.fromBallot(vote.getBallots( ).get(0));
-        return response;
-    }
-    
-    public static VoteItemResponse fromNotParticipating(Vote vote) {
-        var response = new VoteItemResponse( );
-        response.id               = vote.getId( );
-        response.stock            = vote.getStock( );
-        response.description      = vote.getDescription( );
-        response.startAt          = vote.getStartAt( );
-        response.endedAt          = vote.getEndedAt( );
-        response.participantCount = vote.getParticipantsCount( );
-        return response;
-    }
 }

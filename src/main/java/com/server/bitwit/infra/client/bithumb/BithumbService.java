@@ -3,6 +3,7 @@ package com.server.bitwit.infra.client.bithumb;
 import com.server.bitwit.infra.client.bithumb.dto.BithumbCandlestickResponse;
 import com.server.bitwit.infra.client.bithumb.dto.BithumbTickerInfoResponse;
 import com.server.bitwit.module.candlestick.CandlestickRepository;
+import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.stock.StockService;
 import com.server.bitwit.module.stock.dto.UpdateRealTimeInfoRequest;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,13 @@ public class BithumbService {
                          return new UpdateRealTimeInfoRequest(ticker, currentPrice, fluctuate, fluctuateRate);
                      })
                      .subscribe(stockService::updateRealTimeInfo);
+            try {
+                Thread.sleep(10L);
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread( ).interrupt( );
+                throw new BitwitException(e.getMessage( ));
+            }
         });
     }
     

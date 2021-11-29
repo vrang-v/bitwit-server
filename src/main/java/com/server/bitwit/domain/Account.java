@@ -5,16 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter @FieldDefaults(level = PRIVATE)
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor
 @Entity
 public class Account extends BaseTimeEntity {
     
@@ -27,6 +29,14 @@ public class Account extends BaseTimeEntity {
     String email;
     
     String password;
+    
+    boolean emailVerified;
+    
+    String emailToken;
+    
+    LocalDateTime lastEmailTokenGeneratedAt;
+    
+    LocalDateTime joinedAt;
     
     @ManyToMany
     List<Stock> stocks;
@@ -50,31 +60,46 @@ public class Account extends BaseTimeEntity {
     
     public static Account createOAuthAccount(String name, String email, AccountType accountType) {
         var account = new Account( );
-        account.name        = name;
-        account.email       = email;
-        account.authorities = List.of(Authority.USER);
-        account.accountType = accountType;
+        account.name          = name;
+        account.email         = email;
+        account.authorities   = List.of(Authority.USER);
+        account.accountType   = accountType;
+        account.emailVerified = true;
+        account.joinedAt      = LocalDateTime.now( );
         return account;
     }
     
     public Account changeName(String name) {
-        if (name != null) {
+        if (StringUtils.hasText(name)) {
             this.name = name;
         }
         return this;
     }
     
     public Account changePassword(String password) {
-        if (password != null) {
+        if (StringUtils.hasText(password)) {
             this.password = PasswordEncoderFactories.createDelegatingPasswordEncoder( ).encode(password);
         }
         return this;
     }
     
     public Account changeEmail(String email) {
-        if (email != null) {
+        if (StringUtils.hasText(email)) {
             this.email = email;
         }
+        return this;
+    }
+    
+    public Account generateEmailToken( ) {
+        this.emailToken                = UUID.randomUUID( ).toString( );
+        this.lastEmailTokenGeneratedAt = LocalDateTime.now( );
+        return this;
+    }
+    
+    public Account verify( ) {
+        this.joinedAt      = LocalDateTime.now( );
+        this.emailVerified = true;
+        this.emailToken    = null;
         return this;
     }
 }

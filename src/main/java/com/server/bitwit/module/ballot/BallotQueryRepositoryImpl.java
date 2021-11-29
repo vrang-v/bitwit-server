@@ -13,18 +13,18 @@ import static com.server.bitwit.domain.QVote.vote;
 
 @RequiredArgsConstructor
 @Repository
-public class BallotQueryRepositoryImpl implements BallotQueryRepository
-{
+public class BallotQueryRepositoryImpl implements BallotQueryRepository {
+    
     private final JPAQueryFactory query;
     
     @Override
-    public Optional<Ballot> findByVoteAndAccountId(Long accountId, Long voteId)
-    {
+    public Optional<Ballot> findByVoteIdAndAccountId(Long voteId, Long accountId) {
         return Optional.ofNullable(
                 query.selectFrom(ballot)
-                     .join(ballot.vote, vote)
-                     .join(ballot.account, account)
-                     .where(vote.id.eq(voteId),
+                     .innerJoin(ballot.vote, vote)
+                     .innerJoin(ballot.account, account)
+                     .where(
+                             vote.id.eq(voteId),
                              account.id.eq(accountId)
                      )
                      .fetchOne( )

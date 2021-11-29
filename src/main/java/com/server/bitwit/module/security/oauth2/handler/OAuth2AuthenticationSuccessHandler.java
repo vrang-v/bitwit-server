@@ -68,7 +68,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
     
     private boolean isAuthorizedRedirectUri(String uri) {
-        log.info("uri = {}", uri);
         var redirectUri = URI.create(uri);
         return oAuth2Properties.getAuthorizedRedirectUris( )
                                .stream( )

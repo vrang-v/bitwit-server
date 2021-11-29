@@ -1,11 +1,10 @@
 package com.server.bitwit.domain;
 
 import com.server.bitwit.module.common.converter.VotingOptionIntegerMapJsonConverter;
-import com.server.bitwit.module.error.exception.BitwitException;
+import com.server.bitwit.module.error.exception.InvalidRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,12 +17,10 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
-@Slf4j
 @Getter @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
 @Entity
-public class Vote extends BaseTimeEntity
-{
+public class Vote extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "vote_id")
     Long id;
@@ -63,7 +60,7 @@ public class Vote extends BaseTimeEntity
     
     private static void verifyValidPeriod(LocalDateTime startAt, LocalDateTime endedAt) {
         if (startAt.isAfter(endedAt)) {
-            throw new BitwitException("startAt이 endedAt 보다 늦게 설정되어 있습니다.");
+            throw new InvalidRequestException("startAt이 endedAt 보다 늦게 설정되어 있습니다.");
         }
     }
     
@@ -83,7 +80,7 @@ public class Vote extends BaseTimeEntity
         validateActivePeriod( );
         selectionCount.compute(previousOption, (unused, count) -> {
             if (count == null) {
-                throw new BitwitException("변경할 수 있는 투표용지가 없습니다.");
+                throw new InvalidRequestException("변경할 수 있는 투표용지가 없습니다.");
             }
             return count - 1;
         });
@@ -95,7 +92,7 @@ public class Vote extends BaseTimeEntity
         validateActivePeriod( );
         selectionCount.compute(votingOption, (unused, count) -> {
             if (count == null) {
-                throw new BitwitException("삭제할 수 있는 투표용지가 없습니다.");
+                throw new InvalidRequestException("삭제할 수 있는 투표용지가 없습니다.");
             }
             return count - 1;
         });
@@ -105,7 +102,12 @@ public class Vote extends BaseTimeEntity
     
     private void validateActivePeriod( ) {
         if (! isActive( )) {
-            throw new BitwitException("투표 참여기간이 아닙니다.");
+            throw new InvalidRequestException("투표 참여기간이 아닙니다.");
         }
+    }
+    
+    public Vote hideBallots( ) {
+        ballots = null;
+        return this;
     }
 }

@@ -1,12 +1,8 @@
 package com.server.bitwit.module.vote;
 
-import com.server.bitwit.module.security.jwt.Jwt;
-import com.server.bitwit.module.common.dto.BitwitResponse;
-import com.server.bitwit.module.common.dto.SimpleIdResponse;
-import com.server.bitwit.module.vote.dto.VoteClientResponse;
-import com.server.bitwit.module.vote.dto.VoteRequest;
-import com.server.bitwit.module.vote.dto.VoteResponse;
-import com.server.bitwit.module.vote.dto.VoteResponseType;
+import com.server.bitwit.module.security.jwt.support.Jwt;
+import com.server.bitwit.module.vote.dto.*;
+import com.server.bitwit.module.vote.search.VoteSearchCond;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,47 +17,45 @@ import static org.springframework.http.HttpStatus.CREATED;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/votes")
+@RequestMapping("/api/votes")
 public class VoteController {
     
     private final VoteService voteService;
     
     @PostMapping
     @ResponseStatus(CREATED)
-    public BitwitResponse createVote(@Valid @RequestBody VoteRequest voteRequest) {
-        var voteId = voteService.createVote(voteRequest);
-        return SimpleIdResponse.of(voteId);
+    public VoteItemResponse createVote(@Valid @RequestBody CreateVoteRequest createVoteRequest) {
+        return voteService.createVote(createVoteRequest);
+    }
+    
+    @GetMapping("/search/type/{responseType}")
+    public List<? extends VoteResponse> searchVotes(@Jwt Long accountId, @ModelAttribute VoteSearchCond cond, @PathVariable VoteResponseType responseType) {
+        return voteService.searchVotes(cond.withAccountId(accountId), responseType.getResponseType( ));
     }
     
     @GetMapping("/{voteId}")
-    public VoteResponse getVote(@PathVariable Long voteId) {
-        return voteService.getVoteResponse(voteId);
-    }
-    
-    @GetMapping("/{voteId}/type/vote-item")
-    public VoteResponse getVoteItems(@Jwt Long accountId, @PathVariable Long voteId) {
-        return voteService.getVoteItem(voteId, accountId);
-    }
-    
-//    @GetMapping("/{voteId}/type/{responseType}")
-    public VoteResponse getVote(@PathVariable Long voteId, @PathVariable VoteResponseType responseType) {
-        return voteService.getVoteResponse(voteId, responseType);
+    public VoteDefaultResponse getVote(@Jwt Long accountId, @PathVariable Long voteId) {
+        var cond = VoteSearchCond.builder( ).accountId(accountId).voteIds(List.of(voteId)).build( );
+        return voteService.searchVote(cond, VoteDefaultResponse.class);
     }
     
     @GetMapping
-    public List<VoteResponse> getVotes( ) {
-        return voteService.getAllVoteResponses( );
+    public List<VoteDefaultResponse> getVotes(@Jwt Long accountId) {
+        return voteService.searchVotes(new VoteSearchCond( ).withAccountId(accountId), VoteDefaultResponse.class);
     }
     
-    @GetMapping("/type/vote-item")
-    public List<VoteResponse> getVoteItems(@Jwt Long accountId) {
-        return voteService.getVoteItems(accountId);
+    @GetMapping("/{voteId}/type/{responseType}")
+    public VoteResponse getVote(@Jwt Long accountId, @PathVariable Long voteId, @PathVariable VoteResponseType responseType) {
+        var cond = VoteSearchCond.builder( ).accountId(accountId).voteIds(List.of(voteId)).build( );
+        return voteService.searchVote(cond, responseType.getResponseType( ));
     }
     
-//    @GetMapping("/type/{responseType}")
-    public List<VoteResponse> getVotes(@PathVariable VoteResponseType responseType) {
-        return voteService.getAllVoteResponses(responseType);
+    @GetMapping("/type/{responseType}")
+    public List<? extends VoteResponse> getVotes(@Jwt Long accountId, @PathVariable VoteResponseType responseType) {
+        return voteService.searchVotes(new VoteSearchCond( ).withAccountId(accountId), responseType.getResponseType( ));
     }
+    
+    
     
     @GetMapping("/status/active")
     public List<VoteClientResponse> getActiveVotes( ) {
@@ -76,10 +70,5 @@ public class VoteController {
     @GetMapping("/me/{date}")
     public List<VoteClientResponse> getMyVotesByParticipationDate(@Jwt Long accountId, @PathVariable @DateTimeFormat(pattern = "yy-MM-dd") LocalDate date) {
         return voteService.getVotesByAccountIdAndParticipationDate(accountId, date);
-    }
-    
-    @GetMapping("/stock/{stockId}")
-    public List<VoteClientResponse> getVotesByStockId(@PathVariable Long stockId) {
-        return voteService.getVotesByStockId(stockId);
     }
 }

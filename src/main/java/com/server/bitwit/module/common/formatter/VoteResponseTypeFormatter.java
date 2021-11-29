@@ -5,17 +5,15 @@ import org.springframework.format.Formatter;
 
 import java.util.Locale;
 
-public class VoteResponseTypeFormatter implements Formatter<VoteResponseType>
-{
+public class VoteResponseTypeFormatter implements Formatter<VoteResponseType> {
+    
     @Override
-    public VoteResponseType parse(String text, Locale locale)
-    {
+    public VoteResponseType parse(String text, Locale locale) {
         return VoteResponseType.findByTypeName(text);
     }
     
     @Override
-    public String print(VoteResponseType responseType, Locale locale)
-    {
+    public String print(VoteResponseType responseType, Locale locale) {
         return responseType.getTypeName( );
     }
 }

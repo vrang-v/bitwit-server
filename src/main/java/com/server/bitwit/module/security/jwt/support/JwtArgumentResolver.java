@@ -1,6 +1,5 @@
 package com.server.bitwit.module.security.jwt.support;
 
-import com.server.bitwit.module.security.jwt.Jwt;
 import com.server.bitwit.module.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

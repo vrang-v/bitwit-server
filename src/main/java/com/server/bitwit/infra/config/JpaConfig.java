@@ -9,11 +9,11 @@ import javax.persistence.EntityManager;
 
 @Configuration
 @EnableJpaAuditing
-public class JpaConfig
-{
+public class JpaConfig {
+    
     @Bean
-    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager)
-    {
+    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
         return new JPAQueryFactory(entityManager);
     }
+    
 }

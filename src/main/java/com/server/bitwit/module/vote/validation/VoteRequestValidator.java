@@ -2,7 +2,7 @@ package com.server.bitwit.module.vote.validation;
 
 import com.server.bitwit.module.error.exception.FieldErrorException;
 import com.server.bitwit.module.stock.StockService;
-import com.server.bitwit.module.vote.dto.VoteRequest;
+import com.server.bitwit.module.vote.dto.CreateVoteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -10,20 +10,18 @@ import org.springframework.validation.Validator;
 
 @RequiredArgsConstructor
 @Component
-public class VoteRequestValidator implements Validator
-{
+public class VoteRequestValidator implements Validator {
+    
     private final StockService stockService;
     
     @Override
-    public boolean supports(Class<?> clazz)
-    {
-        return VoteRequest.class.isAssignableFrom(clazz);
+    public boolean supports(Class<?> clazz) {
+        return CreateVoteRequest.class.isAssignableFrom(clazz);
     }
     
     @Override
-    public void validate(Object target, Errors errors)
-    {
-        var request = (VoteRequest)target;
+    public void validate(Object target, Errors errors) {
+        var request = (CreateVoteRequest)target;
         
         var startTime = request.getStartAt( );
         var endTime   = request.getEndedAt( );
@@ -38,7 +36,7 @@ public class VoteRequestValidator implements Validator
         }
         
         if (errors.hasErrors( )) {
-            throw new FieldErrorException(errors);
+            throw new FieldErrorException(errors.getAllErrors( ));
         }
     }
 }

@@ -18,12 +18,12 @@ public class BitwitException extends RuntimeException {
     }
     
     public BitwitException(String detailMessage) {
-        super(ErrorCode.DEFAULT.getBaseMessage( ) + ": " + detailMessage);
+        super(ErrorCode.DEFAULT.getBaseMessage( ) + " - " + detailMessage);
         this.errorCode = ErrorCode.DEFAULT;
     }
     
     public BitwitException(ErrorCode errorCode, String detailMessage) {
-        super(errorCode.getBaseMessage( ) + ": " + detailMessage);
+        super(errorCode.getBaseMessage( ) + " - " + detailMessage);
         this.errorCode = errorCode;
     }
 }

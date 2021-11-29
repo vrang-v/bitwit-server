@@ -1,28 +1,29 @@
 package com.server.bitwit.module.account;
 
-import com.server.bitwit.module.security.jwt.Jwt;
+import com.server.bitwit.domain.AccountType;
 import com.server.bitwit.module.account.dto.*;
-import com.server.bitwit.module.common.dto.SimpleIdResponse;
+import com.server.bitwit.module.error.exception.BitwitException;
+import com.server.bitwit.module.error.exception.ErrorCode;
+import com.server.bitwit.module.security.jwt.support.Jwt;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/accounts")
+@RequestMapping("/api/accounts")
 public class AccountController {
     
     private final AccountService accountService;
     
     @PostMapping
     @ResponseStatus(CREATED)
-    public SimpleIdResponse createAccount(@Valid @RequestBody CreateAccountRequest request) {
-        var accountId = accountService.createAccount(request);
-        return SimpleIdResponse.of(accountId);
+    public AccountResponse createAccount(@Valid @RequestBody CreateEmailAccountRequest request) {
+        return accountService.createEmailAccount(request);
     }
     
     @GetMapping("/me")
@@ -31,14 +32,33 @@ public class AccountController {
     }
     
     @PatchMapping
-    @ResponseStatus(NO_CONTENT)
-    public void updateAccount(@Jwt Long accountId, @Valid @RequestBody UpdateAccountRequest request) {
-        accountService.updateAccount(accountId, request);
+    public AccountResponse updateAccount(@Jwt Long accountId, @Valid @RequestBody UpdateAccountRequest request) {
+        return accountService.updateAccount(accountId, request);
     }
     
-    @PostMapping("/duplicate-check/email")
-    public DuplicateCheckResponse checkForDuplicateNickname(@RequestBody DuplicateCheckRequest request) {
-        var result = accountService.existsByEmail(request.getEmail( ));
-        return new DuplicateCheckResponse(result);
+    @GetMapping("/duplicate-check")
+    public DuplicateCheckResponse checkForDuplicateEmail(@Valid @ModelAttribute DuplicateCheckRequest request) {
+        boolean result;
+        if (request.getEmail( ) != null) {
+            result = accountService.existsByEmailAndAccountType(request.getEmail( ), AccountType.EMAIL);
+            return DuplicateCheckResponse.email(request.getEmail( ), result);
+        }
+        if (request.getName( ) != null) {
+            result = accountService.existsByName(request.getName( ));
+            return DuplicateCheckResponse.name(request.getName( ), result);
+        }
+        throw new BitwitException(ErrorCode.INVALID_REQUEST);
+    }
+    
+    @GetMapping("/email-verified-check")
+    public JSONObject checkEmailVerified(@RequestParam Long accountId) {
+        return new JSONObject( )
+                .put("accountId", accountId)
+                .put("verified", accountService.isEmailVerified(accountId));
+    }
+    
+    @GetMapping("/resend-email-token")
+    public void resendEmailToken(@RequestParam Long accountId) {
+        accountService.resendSignUpConfirmEmail(accountId);
     }
 }

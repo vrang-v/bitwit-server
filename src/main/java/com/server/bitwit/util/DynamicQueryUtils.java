@@ -16,13 +16,19 @@ import static org.springframework.util.StringUtils.hasText;
 public class DynamicQueryUtils {
     
     public static Predicate conditions(BooleanExpression... booleanExpressions) {
-        BooleanBuilder condition = new BooleanBuilder( );
+        var condition = new BooleanBuilder( );
         Arrays.stream(booleanExpressions).filter(Objects::nonNull).forEach(condition::and);
         return condition.getValue( );
     }
     
+    public static Predicate combineWithOr(BooleanExpression... booleanExpressions) {
+        var condition = new BooleanBuilder( );
+        Arrays.stream(booleanExpressions).filter(Objects::nonNull).forEach(condition::or);
+        return condition.getValue( );
+    }
+    
     public static Predicate conditions(Collection<BooleanExpression> booleanExpressions) {
-        BooleanBuilder condition = new BooleanBuilder( );
+        var condition = new BooleanBuilder( );
         booleanExpressions.stream( ).filter(Objects::nonNull).forEach(condition::and);
         return condition.getValue( );
     }

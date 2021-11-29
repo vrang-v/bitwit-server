@@ -1,8 +1,8 @@
 package com.server.bitwit.module.stock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.bitwit.module.stock.StockService;
-import com.server.bitwit.module.stock.dto.StockRequest;
+import com.server.bitwit.module.stock.dto.CreateStockRequest;
+import com.server.bitwit.module.stock.dto.StockResponse;
 import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class StockControllerTest
-{
+class StockControllerTest {
     static final String STOCK_NAME = "AAPL";
     
     @Autowired MockMvc      mockMvc;
@@ -32,11 +31,10 @@ class StockControllerTest
     
     @Test
     @DisplayName("Stock 생성 / 정상 / 201")
-    void createStock_normal_200( ) throws Exception
-    {
+    void createStock_normal_200( ) throws Exception {
         // given
-        var request = new StockRequest( );
-        request.setName(STOCK_NAME);
+        var request = new CreateStockRequest( );
+        request.setFullName(STOCK_NAME);
         
         // when, then
         mockMvc.perform(post("/stocks")
@@ -48,8 +46,7 @@ class StockControllerTest
     
     @Test
     @DisplayName("Stock 생성 / 요청 값 없음 / 400")
-    void createStock_noRequestContent_400( ) throws Exception
-    {
+    void createStock_noRequestContent_400( ) throws Exception {
         // when, then
         mockMvc.perform(post("/stocks"))
                .andExpect(status( ).isBadRequest( ));
@@ -57,11 +54,10 @@ class StockControllerTest
     
     @Test
     @DisplayName("Stock 생성 / 유효하지 않은 요청 / 400")
-    void createStock_invalidRequest_400( ) throws Exception
-    {
+    void createStock_invalidRequest_400( ) throws Exception {
         // given
-        var request = new StockRequest( );
-        request.setName(null);
+        var request = new CreateStockRequest( );
+        request.setFullName(null);
         
         // when, then
         mockMvc.perform(post("/stocks")
@@ -72,10 +68,9 @@ class StockControllerTest
     
     @Test
     @DisplayName("Stock 조회 / 정상 / 200")
-    void getStock( ) throws Exception
-    {
+    void getStock( ) throws Exception {
         // given
-        var stockId = createMockStock(STOCK_NAME);
+        var stockId = createMockStock(STOCK_NAME).getId( );
         var expectedJson = new JSONObject( )
                 .put("id", stockId)
                 .put("name", STOCK_NAME)
@@ -89,17 +84,15 @@ class StockControllerTest
     
     @Test
     @DisplayName("Stock 조회 / 존재하지 않는 id / 404")
-    void getStock_nonExistentId_400( ) throws Exception
-    {
+    void getStock_nonExistentId_400( ) throws Exception {
         var nonExistentId = - 1;
         mockMvc.perform(get("/stocks/" + nonExistentId))
                .andExpect(status( ).isNotFound( ));
     }
     
-    private Long createMockStock(String name)
-    {
-        var request = new StockRequest( );
-        request.setName(name);
+    private StockResponse createMockStock(String name) {
+        var request = new CreateStockRequest( );
+        request.setFullName(name);
         
         return stockService.createStock(request);
     }

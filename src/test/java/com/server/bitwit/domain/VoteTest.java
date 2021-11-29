@@ -10,14 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class VoteTest
-{
+class VoteTest {
     @Test
     @DisplayName("Vote 생성 / 정상")
-    void createVote_normal( )
-    {
+    void createVote_normal( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(2022, 1, 1, 0, 0);
@@ -35,10 +33,9 @@ class VoteTest
     
     @Test
     @DisplayName("Vote 생성 / 시작 시간이 끝나는 시간 보다 뒤")
-    void createVote_startTimeIsLaterThanEndTime_exception( )
-    {
+    void createVote_startTimeIsLaterThanEndTime_exception( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2022, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(2021, 1, 1, 0, 0);
@@ -49,10 +46,9 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 추가 / 정상")
-    void addBallot_normal( )
-    {
+    void addBallot_normal( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(3021, 1, 1, 0, 0);
@@ -73,10 +69,9 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 추가 / 투표 기간 종료")
-    void addBallot_votingPeriodEnd( )
-    {
+    void addBallot_votingPeriodEnd( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2000, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(2020, 1, 1, 0, 0);
@@ -91,10 +86,9 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 수정 / 정상")
-    void changeBallot_normal( )
-    {
+    void changeBallot_normal( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(3021, 1, 1, 0, 0);
@@ -116,10 +110,9 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 수정 / 투표 기간 종료")
-    void changeBallot_votingPeriodEnd( )
-    {
+    void changeBallot_votingPeriodEnd( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(3021, 1, 1, 0, 0);
@@ -141,17 +134,15 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 수정 / 수량 0인 항목을 변경")
-    void changeBallot_changeCount0Option( )
-    {
+    void changeBallot_changeCount0Option( ) {
         // TODO: 투표 유효 기간에 참여한 항목을 투표 기간이 종료되고 항목을 변경하는 테스트
     }
     
     @Test
     @DisplayName("Ballot 삭제 / 정상")
-    void removeBallot_normal( )
-    {
+    void removeBallot_normal( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(3021, 1, 1, 0, 0);
@@ -173,10 +164,9 @@ class VoteTest
     
     @Test
     @DisplayName("Ballot 삭제 / 수량 0인 항목을 삭제")
-    void removeBallot_removeCount0Option( )
-    {
+    void removeBallot_removeCount0Option( ) {
         // given
-        var stock       = Stock.createStock("AAPL");
+        var stock       = Stock.createStock("AAPL", "Apple.inc", "애플");
         var description = "test description";
         var startTime   = LocalDateTime.of(2021, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(3021, 1, 1, 0, 0);

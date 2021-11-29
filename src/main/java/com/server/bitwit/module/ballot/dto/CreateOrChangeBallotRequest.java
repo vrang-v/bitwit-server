@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrChangeBallotRequest
-{
+public class CreateOrChangeBallotRequest {
+    
     @NotNull
     Long voteId;
     

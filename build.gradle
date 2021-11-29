@@ -27,21 +27,35 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     implementation 'com.querydsl:querydsl-jpa'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.0'
+    implementation 'org.json:json:20210307'
 
-    runtimeOnly    'io.jsonwebtoken:jjwt-impl:0.11.2'
-    runtimeOnly    'io.jsonwebtoken:jjwt-orgjson:0.11.2'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
     compileOnly 'org.projectlombok:lombok'
 
+    // Caution! MapStruct AnnotationProcessor must be declared after Lombok AnnotationProcessor
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    annotationProcessor 'org.mapstruct.extensions.spring:mapstruct-spring-extensions:0.1.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
 
-    runtimeOnly 'com.h2database:h2'
+    testCompileOnly 'org.projectlombok:lombok'
+
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 test {
