@@ -11,7 +11,7 @@ public class BithumbScheduler {
     
     private final BithumbService bithumbService;
     
-    @Scheduled(fixedDelay = 3000000)
+    @Scheduled(fixedDelay = 3000)
     public void updateRealTimePriceTask( ) {
         bithumbService.updateRealTimePrice( );
     }

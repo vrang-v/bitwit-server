@@ -9,4 +9,5 @@ public class CommentSearchCond {
     
     private Long writerId;
     
+    private Long likerId;
 }

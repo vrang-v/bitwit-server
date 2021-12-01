@@ -26,7 +26,6 @@ public class PostQueryRepositoryImpl extends QuerydslRepositoryBase implements P
     
     @Override
     public Page<Post> searchPost(PostSearchCond cond, Pageable pageable) {
-        
         return paginate(pageable,
                 selectFrom(post)
                         .distinct( )
@@ -40,7 +39,8 @@ public class PostQueryRepositoryImpl extends QuerydslRepositoryBase implements P
                                         contains(post.title, cond.getKeyword( )),
                                         contains(post.content, cond.getKeyword( ))
                                 ),
-                                eq(post.writer.name, cond.getWriter( ))
+                                eq(post.writer.name, cond.getWriter( )),
+                                eq(postLike.account.id, cond.getLikerId( ))
                         )
         );
     }
@@ -49,6 +49,7 @@ public class PostQueryRepositoryImpl extends QuerydslRepositoryBase implements P
     public Optional<Post> findByIdWithWriterAndStockAndLikes(Long postId) {
         return Optional.ofNullable(
                 selectFrom(post)
+                        .distinct( )
                         .leftJoin(post.writer).fetchJoin( )
                         .leftJoin(post.stocks)
                         .where(

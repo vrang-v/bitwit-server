@@ -30,7 +30,8 @@ public class CommentQueryRepositoryImpl extends QuerydslRepositoryBase implement
                         .leftJoin(comment.likes, commentLike)
                         .where(
                                 eq(comment.writer.name, cond.getWriterName( )),
-                                eq(comment.writer.id, cond.getWriterId( ))
+                                eq(comment.writer.id, cond.getWriterId( )),
+                                eq(commentLike.account.id, cond.getLikerId( ))
                         )
         );
     }
