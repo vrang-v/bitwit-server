@@ -20,4 +20,6 @@ public class AccountResponse {
     AccountType accountType;
     
     boolean emailVerified;
+    
+    String profileImage;
 }

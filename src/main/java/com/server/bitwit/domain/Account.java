@@ -38,6 +38,9 @@ public class Account extends BaseTimeEntity {
     
     LocalDateTime joinedAt;
     
+    @Embedded
+    UploadFile profileImage;
+    
     @ManyToMany
     List<Stock> stocks;
     
@@ -87,6 +90,11 @@ public class Account extends BaseTimeEntity {
         if (StringUtils.hasText(email)) {
             this.email = email;
         }
+        return this;
+    }
+    
+    public Account changeProfileImage(UploadFile profileImage) {
+        this.profileImage = profileImage;
         return this;
     }
     

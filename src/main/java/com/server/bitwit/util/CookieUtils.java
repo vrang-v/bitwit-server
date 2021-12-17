@@ -7,6 +7,7 @@ import org.springframework.util.SerializationUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -16,14 +17,13 @@ public class CookieUtils {
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         var cookies = request.getCookies( );
         
-        if (cookies != null && cookies.length > 0) {
-            for (var cookie : cookies) {
-                if (cookie.getName( ).equals(name)) {
-                    return Optional.of(cookie);
-                }
-            }
+        if (! hasCookie(cookies)) {
+            return Optional.empty( );
         }
-        return Optional.empty( );
+        
+        return Arrays.stream(cookies)
+                     .filter(cookie -> cookie.getName( ).equals(name))
+                     .findFirst( );
     }
     
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
@@ -36,7 +36,7 @@ public class CookieUtils {
     
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         var cookies = request.getCookies( );
-        if (cookies != null && cookies.length > 0) {
+        if (hasCookie(cookies)) {
             for (var cookie : cookies) {
                 if (cookie.getName( ).equals(name)) {
                     cookie.setValue("");
@@ -55,5 +55,9 @@ public class CookieUtils {
     
     public static <T> T deserialize(Cookie cookie, Class<T> clazz) {
         return clazz.cast(SerializationUtils.deserialize(Base64.getUrlDecoder( ).decode(cookie.getValue( ))));
+    }
+    
+    private static boolean hasCookie(Cookie[] cookies) {
+        return cookies != null && cookies.length > 0;
     }
 }

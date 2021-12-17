@@ -12,15 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 public class LoggingInterceptor implements HandlerInterceptor {
     
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-    throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         log.info("[REQUEST]  [{}] [{}]", request.getRequestURI( ), request.getRemoteAddr( ));
         return true;
     }
     
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-    throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         log.info("[RESPONSE] [{}] [{}]", request.getRequestURI( ), response.getStatus( ));
     }
 }

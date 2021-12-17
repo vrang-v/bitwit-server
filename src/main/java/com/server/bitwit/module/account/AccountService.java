@@ -10,11 +10,16 @@ import com.server.bitwit.module.common.service.EmailService;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
+import com.server.bitwit.module.file.FileStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
@@ -28,6 +33,8 @@ public class AccountService {
     
     private final ConversionService conversionService;
     private final EmailService      emailService;
+    
+    private final FileStorage fileStorage;
     
     @Transactional
     public AccountResponse createEmailAccount(CreateEmailAccountRequest request) {
@@ -44,6 +51,14 @@ public class AccountService {
                                 .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
     }
     
+    public Resource getProfileImage(Long accountId) throws MalformedURLException {
+        var uploadFileName = accountRepository.findById(accountId)
+                                       .orElseThrow(( ) -> new NonExistentResourceException("account", accountId))
+                                       .getProfileImage( )
+                                              .getUploadFileName( );
+        return new UrlResource("file:" + fileStorage.getFullPath(uploadFileName));
+    }
+    
     @Transactional
     public AccountResponse updateAccount(Long accountId, UpdateAccountRequest request) {
         var account = accountRepository.findById(accountId)
@@ -51,6 +66,15 @@ public class AccountService {
                                        .changeName(request.getName( ))
                                        .changeEmail(request.getEmail( ))
                                        .changePassword(request.getPassword( ));
+        return conversionService.convert(account, AccountResponse.class);
+    }
+    
+    @Transactional
+    public AccountResponse changeProfileImage(Long accountId, MultipartFile profileImage) {
+        var uploadFile = fileStorage.upload(profileImage);
+        var account = accountRepository.findById(accountId)
+                                       .orElseThrow(( ) -> new NonExistentResourceException("account", accountId))
+                                       .changeProfileImage(uploadFile);
         return conversionService.convert(account, AccountResponse.class);
     }
     

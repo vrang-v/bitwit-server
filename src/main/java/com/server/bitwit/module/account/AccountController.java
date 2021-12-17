@@ -7,9 +7,12 @@ import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.security.jwt.support.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.net.MalformedURLException;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -26,9 +29,19 @@ public class AccountController {
         return accountService.createEmailAccount(request);
     }
     
+    @PostMapping("/profile-image")
+    public AccountResponse setProfileImage(@Jwt Long accountId, @RequestParam("file") MultipartFile file) {
+        return accountService.changeProfileImage(accountId, file);
+    }
+    
     @GetMapping("/me")
     public AccountResponse getAccount(@Jwt Long accountId) {
         return accountService.getAccountResponse(accountId);
+    }
+    
+    @GetMapping(path = "/me/profile-image", produces = "image/jpeg")
+    public Resource getProfileImage(@Jwt Long accountId) throws MalformedURLException {
+        return accountService.getProfileImage(accountId);
     }
     
     @PatchMapping

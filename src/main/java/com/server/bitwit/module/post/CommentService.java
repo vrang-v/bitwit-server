@@ -110,12 +110,14 @@ public class CommentService {
     public LikeResponse like(Long commentId, Long accountId) {
         var like = likeRepository.findByCommentIdAndAccountId(commentId, accountId);
         if (like.isPresent( )) {
-            return conversionService.convert(like.get( ), LikeResponse.class).setLike( );
+            return conversionService.convert(like.get( ), LikeResponse.class)
+                                    .setLike( );
         }
         var comment = conversionService.convert(commentId, Comment.class);
         var account = conversionService.convert(accountId, Account.class);
         var newLike = likeRepository.save(new CommentLike(comment, account));
-        return conversionService.convert(newLike, LikeResponse.class).setLike( );
+        return conversionService.convert(newLike, LikeResponse.class)
+                                .setLike( );
     }
     
     public LikeResponse dislike(Long commentId, Long accountId) {

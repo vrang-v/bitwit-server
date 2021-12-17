@@ -2,6 +2,7 @@ package com.server.bitwit.module.common.mapper.post;
 
 import com.server.bitwit.domain.Comment;
 import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.module.common.mapper.account.AccountResponseMapper;
 import com.server.bitwit.module.post.dto.CommentWithPostResponse;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -11,7 +12,7 @@ import org.springframework.core.convert.converter.Converter;
 
 import java.util.Optional;
 
-@Mapper(config = MapStructConfig.class, uses = PostResponseMapper.class)
+@Mapper(config = MapStructConfig.class, uses = {AccountResponseMapper.class, PostResponseMapper.class})
 public interface CommentWithPostResponseMapper extends Converter<Comment, CommentWithPostResponse> {
     
     @Override
