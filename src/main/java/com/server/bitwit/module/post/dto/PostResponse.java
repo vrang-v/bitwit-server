@@ -43,6 +43,8 @@ public class PostResponse {
     
     int commentCount;
     
+    boolean edited;
+    
     @JsonIgnore
     Set<LikeResponse> likes;
     

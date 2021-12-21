@@ -61,4 +61,22 @@ public class Post extends BaseTimeEntity {
         viewCount += 1;
         return this;
     }
+    
+    public Post updateTitle(String title) {
+        this.title  = title;
+        this.edited = true;
+        return this;
+    }
+    
+    public Post updateContent(String content) {
+        this.content = content;
+        this.edited  = true;
+        return this;
+    }
+    
+    public Post updateStocks(Set<Stock> stocks) {
+        this.stocks = stocks;
+        this.edited = true;
+        return this;
+    }
 }

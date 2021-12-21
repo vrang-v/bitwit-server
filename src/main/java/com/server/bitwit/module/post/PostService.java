@@ -5,17 +5,19 @@ import com.server.bitwit.domain.Post;
 import com.server.bitwit.domain.PostLike;
 import com.server.bitwit.module.error.exception.InvalidRequestException;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
-import com.server.bitwit.module.post.dto.CreatePostRequest;
-import com.server.bitwit.module.post.dto.LikeResponse;
-import com.server.bitwit.module.post.dto.PostResponse;
-import com.server.bitwit.module.post.dto.PostViewer;
+import com.server.bitwit.module.post.dto.*;
 import com.server.bitwit.module.post.search.PostSearchCond;
+import com.server.bitwit.module.stock.StockRepository;
+import com.server.bitwit.module.stock.dto.SearchStockCond;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class PostService {
     
     private final PostRepository     postRepository;
     private final PostLikeRepository likeRepository;
+    private final StockRepository    stockRepository;
     
     private final CommentService    commentService;
     private final ConversionService conversionService;
@@ -35,6 +38,27 @@ public class PostService {
                        .map(postRepository::save)
                        .map(post -> conversionService.convert(post, PostResponse.class))
                        .orElseThrow( );
+    }
+    
+    @Transactional
+    public PostResponse updatePost(Long postId, UpdatePostRequest request) {
+        return postRepository.findById(postId)
+                             .map(post -> {
+                                 if (StringUtils.hasText(request.getTitle( ))) {
+                                     post.updateTitle(request.getTitle( ));
+                                 }
+                                 if (StringUtils.hasText(request.getContent( ))) {
+                                     post.updateContent(request.getContent( ));
+                                 }
+                                 if (! CollectionUtils.isEmpty(request.getTickers( ))) {
+                                     var cond = new SearchStockCond( );
+                                     cond.setTickers(request.getTickers( ));
+                                     var stocks = stockRepository.searchStocks(cond);
+                                     post.updateStocks(new HashSet<>(stocks));
+                                 }
+                                 return conversionService.convert(post, PostResponse.class);
+                             })
+                             .orElseThrow(( ) -> new NonExistentResourceException("post", postId));
     }
     
     @Transactional

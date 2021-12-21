@@ -1,9 +1,6 @@
 package com.server.bitwit.module.post;
 
-import com.server.bitwit.module.post.dto.CommentResponse;
-import com.server.bitwit.module.post.dto.CreatePostRequest;
-import com.server.bitwit.module.post.dto.LikeResponse;
-import com.server.bitwit.module.post.dto.PostResponse;
+import com.server.bitwit.module.post.dto.*;
 import com.server.bitwit.module.post.search.PostSearchCond;
 import com.server.bitwit.module.security.jwt.support.Jwt;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +35,11 @@ public class PostController {
     @GetMapping("/{postId}")
     public PostResponse getPost(@Jwt Long accountId, @PathVariable Long postId) {
         return postService.getPost(postId, accountId);
+    }
+    
+    @PatchMapping("/{postId}")
+    public PostResponse updatePost(@Jwt Long accountId, @PathVariable Long postId, @Valid @RequestBody UpdatePostRequest request) {
+        return postService.updatePost(postId, request.withAccountId(accountId));
     }
     
     @DeleteMapping("/{postId}")
