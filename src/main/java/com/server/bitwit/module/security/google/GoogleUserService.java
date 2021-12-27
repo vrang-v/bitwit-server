@@ -54,5 +54,4 @@ public class GoogleUserService {
         return Account.createOAuthAccount(googleUser.getName( ), googleUser.getEmail( ), GOOGLE)
                       .changeProfileImage(uploadFile);
     }
-    
 }

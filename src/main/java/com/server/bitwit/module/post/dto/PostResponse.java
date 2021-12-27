@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.bitwit.module.account.dto.AccountResponse;
 import com.server.bitwit.module.stock.dto.StockResponse;
+import com.server.bitwit.module.tag.dto.TagResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,8 @@ public class PostResponse {
     int viewCount;
     
     AccountResponse writer;
+    
+    List<TagResponse> tags;
     
     Set<StockResponse> stocks;
     

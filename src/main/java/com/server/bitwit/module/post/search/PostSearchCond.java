@@ -14,6 +14,8 @@ public class PostSearchCond {
     
     List<Long> stockIds;
     
+    List<String> tags;
+    
     List<String> tickers;
     
     String writer;

@@ -21,6 +21,8 @@ public class CreatePostRequest {
     
     List<String> tickers;
     
+    List<String> tags;
+    
     public CreatePostRequest withAccountId(long accountId) {
         this.accountId = accountId;
         return this;

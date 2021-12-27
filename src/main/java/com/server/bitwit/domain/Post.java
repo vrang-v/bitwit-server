@@ -37,6 +37,9 @@ public class Post extends BaseTimeEntity {
     Account writer;
     
     @ManyToMany
+    List<Tag> tags = new ArrayList<>( );
+    
+    @ManyToMany
     Set<Stock> stocks = new HashSet<>( );
     
     @BatchSize(size = 500)
@@ -50,6 +53,11 @@ public class Post extends BaseTimeEntity {
         this.title   = title;
         this.content = content;
         this.writer  = writer;
+    }
+    
+    public Post addTag(Tag tag) {
+        this.tags.add(tag);
+        return this;
     }
     
     public Post addStock(Stock stock) {
