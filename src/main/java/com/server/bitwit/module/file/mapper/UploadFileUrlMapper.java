@@ -1,7 +1,7 @@
-package com.server.bitwit.module.common.mapper.support;
+package com.server.bitwit.module.file.mapper;
 
 import com.server.bitwit.domain.UploadFile;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

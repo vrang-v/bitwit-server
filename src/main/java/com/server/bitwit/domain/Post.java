@@ -55,6 +55,11 @@ public class Post extends BaseTimeEntity {
         this.writer  = writer;
     }
     
+    public Post clearTag( ) {
+        this.tags.clear();
+        return this;
+    }
+    
     public Post addTag(Tag tag) {
         this.tags.add(tag);
         return this;

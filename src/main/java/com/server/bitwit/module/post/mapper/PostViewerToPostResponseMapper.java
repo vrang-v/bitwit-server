@@ -1,6 +1,6 @@
-package com.server.bitwit.module.common.mapper.post;
+package com.server.bitwit.module.post.mapper;
 
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.post.CommentService;
 import com.server.bitwit.module.post.dto.PostResponse;
 import com.server.bitwit.module.post.dto.PostViewer;

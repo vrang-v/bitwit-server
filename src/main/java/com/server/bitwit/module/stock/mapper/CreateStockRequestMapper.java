@@ -1,7 +1,7 @@
-package com.server.bitwit.module.common.mapper.stock;
+package com.server.bitwit.module.stock.mapper;
 
 import com.server.bitwit.domain.Stock;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.stock.dto.CreateStockRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;

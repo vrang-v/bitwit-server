@@ -1,8 +1,8 @@
-package com.server.bitwit.module.common.mapper.account;
+package com.server.bitwit.module.account.mapper;
 
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.module.account.AccountService;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;

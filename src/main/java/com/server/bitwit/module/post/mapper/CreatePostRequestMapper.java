@@ -1,9 +1,9 @@
-package com.server.bitwit.module.common.mapper.post;
+package com.server.bitwit.module.post.mapper;
 
 import com.server.bitwit.domain.Post;
 import com.server.bitwit.domain.Tag;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
-import com.server.bitwit.module.common.mapper.account.AccountIdMapper;
+import com.server.bitwit.infra.config.MapStructConfig;
+import com.server.bitwit.module.account.mapper.AccountIdMapper;
 import com.server.bitwit.module.post.dto.CreatePostRequest;
 import com.server.bitwit.module.stock.StockRepository;
 import com.server.bitwit.module.stock.dto.SearchStockCond;

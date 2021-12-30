@@ -1,7 +1,7 @@
-package com.server.bitwit.module.common.mapper.vote;
+package com.server.bitwit.module.vote.mapper;
 
 import com.server.bitwit.domain.Vote;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.stock.StockService;
 import com.server.bitwit.module.vote.dto.CreateVoteRequest;
 import org.mapstruct.Mapper;

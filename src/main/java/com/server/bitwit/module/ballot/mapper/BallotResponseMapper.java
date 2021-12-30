@@ -1,9 +1,9 @@
-package com.server.bitwit.module.common.mapper.ballot;
+package com.server.bitwit.module.ballot.mapper;
 
 import com.server.bitwit.domain.Ballot;
 import com.server.bitwit.module.ballot.dto.BallotResponse;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
-import com.server.bitwit.module.common.mapper.account.AccountResponseMapper;
+import com.server.bitwit.infra.config.MapStructConfig;
+import com.server.bitwit.module.account.mapper.AccountResponseMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;

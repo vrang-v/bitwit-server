@@ -18,6 +18,8 @@ public class UpdatePostRequest {
     
     Long stockId;
     
+    List<String> tags;
+    
     List<String> tickers;
     
     public UpdatePostRequest withAccountId(long accountId) {

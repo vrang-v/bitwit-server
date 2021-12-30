@@ -1,4 +1,4 @@
-package com.server.bitwit.module.common.mapper;
+package com.server.bitwit.infra.config;
 
 import org.mapstruct.MapperConfig;
 

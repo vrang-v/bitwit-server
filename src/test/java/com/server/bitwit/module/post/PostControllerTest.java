@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -54,7 +56,7 @@ class PostControllerTest {
         var request = new CreatePostRequest( );
         request.setTitle("시황 정리");
         request.setContent("나스닥 폭락");
-        request.setStockId(1L);
+        request.setTickers(List.of("BTC"));
         
         // then
         mockMvc.perform(post("/api/posts")

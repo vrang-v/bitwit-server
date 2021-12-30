@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 public class OAuth2UserPrincipal extends DefaultOAuth2User implements AccountPrincipal {
     
-    private final Account account;
+    private final transient Account account;
     
     public OAuth2UserPrincipal(Account account, Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes, String nameAttributeKey) {
         super(authorities, attributes, nameAttributeKey);

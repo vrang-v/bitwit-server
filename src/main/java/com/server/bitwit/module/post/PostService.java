@@ -3,12 +3,14 @@ package com.server.bitwit.module.post;
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Post;
 import com.server.bitwit.domain.PostLike;
+import com.server.bitwit.domain.Tag;
 import com.server.bitwit.module.error.exception.InvalidRequestException;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
 import com.server.bitwit.module.post.dto.*;
 import com.server.bitwit.module.post.search.PostSearchCond;
 import com.server.bitwit.module.stock.StockRepository;
 import com.server.bitwit.module.stock.dto.SearchStockCond;
+import com.server.bitwit.module.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +33,7 @@ public class PostService {
     private final PostRepository     postRepository;
     private final PostLikeRepository likeRepository;
     private final StockRepository    stockRepository;
+    private final TagRepository      tagRepository;
     
     private final CommentService    commentService;
     private final ConversionService conversionService;
@@ -42,6 +47,8 @@ public class PostService {
     
     @Transactional
     public PostResponse updatePost(Long postId, UpdatePostRequest request) {
+        var inputStream         = new ByteArrayInputStream(new byte[] {1, 2, 3});
+        var bufferedInputStream = new BufferedInputStream(inputStream);
         return postRepository.findById(postId)
                              .map(post -> {
                                  if (StringUtils.hasText(request.getTitle( ))) {
@@ -51,6 +58,14 @@ public class PostService {
                                      post.updateContent(request.getContent( ));
                                  }
                                  if (! CollectionUtils.isEmpty(request.getTickers( ))) {
+                                     post.clearTag( );
+                                     request.getTags( )
+                                            .stream( )
+                                            .map(name ->
+                                                    tagRepository.findByName(name)
+                                                                 .orElseGet(( ) -> tagRepository.save(new Tag(name)))
+                                            )
+                                            .forEach(post::addTag);
                                      var cond = new SearchStockCond( );
                                      cond.setTickers(request.getTickers( ));
                                      var stocks = stockRepository.searchStocks(cond);

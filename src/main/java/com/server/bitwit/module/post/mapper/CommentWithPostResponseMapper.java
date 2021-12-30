@@ -1,9 +1,9 @@
-package com.server.bitwit.module.common.mapper.post;
+package com.server.bitwit.module.post.mapper;
 
 import com.server.bitwit.domain.Comment;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
-import com.server.bitwit.module.common.mapper.account.AccountResponseMapper;
-import com.server.bitwit.module.post.dto.CommentResponse;
+import com.server.bitwit.infra.config.MapStructConfig;
+import com.server.bitwit.module.account.mapper.AccountResponseMapper;
+import com.server.bitwit.module.post.dto.CommentWithPostResponse;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,14 +12,14 @@ import org.springframework.core.convert.converter.Converter;
 
 import java.util.Optional;
 
-@Mapper(config = MapStructConfig.class, uses = {AccountResponseMapper.class, CommentLikeResponseMapper.class})
-public interface CommentResponseMapper extends Converter<Comment, CommentResponse> {
+@Mapper(config = MapStructConfig.class, uses = {AccountResponseMapper.class, PostResponseMapper.class})
+public interface CommentWithPostResponseMapper extends Converter<Comment, CommentWithPostResponse> {
     
     @Override
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "parentId", source = "comment")
     @Mapping(target = "likeCount", expression = "java(comment.getLikes().size())")
-    CommentResponse convert(Comment comment);
+    CommentWithPostResponse convert(Comment comment);
     
     default Long parentId(Comment comment) {
         return Optional.ofNullable(comment.getParent( ))
@@ -28,7 +28,7 @@ public interface CommentResponseMapper extends Converter<Comment, CommentRespons
     }
     
     @AfterMapping
-    default void afterMapping(Comment comment, @MappingTarget CommentResponse response) {
+    default void afterMapping(Comment comment, @MappingTarget CommentWithPostResponse response) {
         if (comment.isDeleted( )) {
             response.setWriter(null);
         }

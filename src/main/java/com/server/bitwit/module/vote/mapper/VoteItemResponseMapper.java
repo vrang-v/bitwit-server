@@ -1,9 +1,9 @@
-package com.server.bitwit.module.common.mapper.vote;
+package com.server.bitwit.module.vote.mapper;
 
 import com.server.bitwit.domain.Ballot;
 import com.server.bitwit.domain.Vote;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
-import com.server.bitwit.module.common.mapper.ballot.BallotResponseMapper;
+import com.server.bitwit.infra.config.MapStructConfig;
+import com.server.bitwit.module.ballot.mapper.BallotResponseMapper;
 import com.server.bitwit.module.vote.dto.VoteItemResponse;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

@@ -1,7 +1,7 @@
-package com.server.bitwit.module.common.mapper.post;
+package com.server.bitwit.module.post.mapper;
 
 import com.server.bitwit.domain.Post;
-import com.server.bitwit.module.common.mapper.MapStructConfig;
+import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
 import com.server.bitwit.module.post.PostRepository;
 import org.mapstruct.Mapper;
