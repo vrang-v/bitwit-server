@@ -12,6 +12,7 @@ import com.server.bitwit.module.stock.dto.CreateStockRequest;
 import com.server.bitwit.module.vote.VoteService;
 import com.server.bitwit.module.vote.dto.CreateVoteRequest;
 import com.server.bitwit.util.MockJwt;
+import com.server.bitwit.util.MockMvcTest;
 import com.server.bitwit.util.WithMockAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@MockMvcTest
 @Transactional
-@AutoConfigureMockMvc
 class BallotControllerTest {
     
     @Autowired MockMvc      mockMvc;
@@ -91,7 +91,7 @@ class BallotControllerTest {
                )
                .andExpect(matchAll(
                        status( ).isNotFound( ),
-                       jsonPath("code").value(ErrorCode.INVALID_REQUEST.getCode( ))
+                       jsonPath("code").value(ErrorCode.RESOURCE_NOT_FOUND.getCode( ))
                ));
     }
     
@@ -111,7 +111,7 @@ class BallotControllerTest {
                )
                .andExpect(matchAll(
                        status( ).isNotFound( ),
-                       jsonPath("code").value(ErrorCode.INVALID_REQUEST.getCode( ))
+                       jsonPath("code").value(ErrorCode.RESOURCE_NOT_FOUND.getCode( ))
                ));
     }
     

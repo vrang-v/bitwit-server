@@ -2,7 +2,6 @@ package com.server.bitwit.module.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.bitwit.module.account.dto.CreateEmailAccountRequest;
-import com.server.bitwit.module.account.dto.DuplicateCheckRequest;
 import com.server.bitwit.module.account.dto.UpdateAccountRequest;
 import com.server.bitwit.module.auth.dto.LoginRequest;
 import com.server.bitwit.module.error.exception.ErrorCode;
@@ -21,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,18 +41,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @MockMvcTest
+@Transactional
 class AccountControllerTest {
     
     @Autowired MockMvc      mockMvc;
     @Autowired ObjectMapper objectMapper;
     
-    @Autowired JwtService jwtService;
+    @Autowired AccountService accountService;
+    @Autowired JwtService     jwtService;
     
     @Autowired AccountRepository accountRepository;
     
     @AfterEach
     void tearDown( ) {
-        accountRepository.deleteAll( );
+        accountService.deleteByEmail(WithMockAccount.DEFAULT_EMAIL);
     }
     
     @ParameterizedTest
@@ -63,18 +65,16 @@ class AccountControllerTest {
         var request = new CreateEmailAccountRequest(source.name, source.email, source.password);
         
         // then
-        var resultActions =
-                mockMvc.perform(
-                               post("/api/accounts")
-                                       .accept(APPLICATION_JSON_UTF8)
-                                       .contentType(MediaType.APPLICATION_JSON)
-                                       .content(objectMapper.writeValueAsString(request))
-                       )
-                       .andDo(print( ))
-                       .andExpect(matchAll(
-                               status( ).is(source.httpStatus.value( )),
-                               matchAllItem(source.resultMatchers)
-                       ));
+        var resultActions = mockMvc.perform(post("/api/accounts")
+                                           .accept(APPLICATION_JSON_UTF8)
+                                           .contentType(MediaType.APPLICATION_JSON)
+                                           .content(objectMapper.writeValueAsString(request))
+                                   )
+                                   .andDo(print( ))
+                                   .andExpect(matchAll(
+                                           status( ).is(source.httpStatus.value( )),
+                                           matchAllItem(source.resultMatchers)
+                                   ));
         
         // document
         if (source.httpStatus.is2xxSuccessful( )) {
@@ -96,7 +96,7 @@ class AccountControllerTest {
                )
                .andExpect(matchAll(
                        status( ).isOk( ),
-                       jsonPath("id").exists( ),
+                       jsonPath("accountId").exists( ),
                        jsonPath("name").exists( ),
                        jsonPath("email").exists( ),
                        jsonPath("password").doesNotExist( )
@@ -148,7 +148,7 @@ class AccountControllerTest {
         
         if (source.password.equals("newpassword")) {
             // 변경 전 비밀번호로 로그인
-            mockMvc.perform(post("/api/resolveIdToken")
+            mockMvc.perform(post("/api/login")
                            .accept(APPLICATION_JSON_UTF8)
                            .contentType(APPLICATION_JSON)
                            .content(objectMapper.writeValueAsString(new LoginRequest(source.email, "password")))
@@ -156,7 +156,7 @@ class AccountControllerTest {
                    .andExpect(status( ).isUnauthorized( ));
             
             // 변경 후 비밀번호로 로그인
-            mockMvc.perform(post("/api/resolveIdToken")
+            mockMvc.perform(post("/api/login")
                            .accept(APPLICATION_JSON_UTF8)
                            .contentType(APPLICATION_JSON)
                            .content(objectMapper.writeValueAsString(new LoginRequest(source.email, source.password)))
@@ -164,8 +164,8 @@ class AccountControllerTest {
                    .andExpect(matchAll(
                            status( ).isOk( ),
                            jsonPath("jwt").exists( ),
-                           jsonPath("id").exists( ),
-                           jsonPath("pasword").doesNotExist( )
+                           jsonPath("accountId").exists( ),
+                           jsonPath("password").doesNotExist( )
                    ));
         }
     }
@@ -175,15 +175,11 @@ class AccountControllerTest {
     @WithMockAccount
     @DisplayName("이메일 중복 체크 / 중복 / 200")
     void checkForDuplicateEmail(CheckForDuplicateEmailTestSource source) throws Exception {
-        // given
-        var request = new DuplicateCheckRequest( );
-        request.setEmail(source.email);
-        
-        // then
-        mockMvc.perform(post("/api/accounts/duplicate-check/email")
+        mockMvc.perform(get("/api/accounts/duplicate-check/email")
+                       .param("email", source.email)
                        .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(request))
+                       .accept(APPLICATION_JSON_UTF8)
                )
                .andExpect(matchAllItem(source.resultMatchers));
     }
@@ -191,7 +187,7 @@ class AccountControllerTest {
     @AllArgsConstructor
     enum CreateAccountTestSource {
         정상_201("name", "email@email.com", "password", CREATED,
-                List.of(jsonPath("id").exists( ),
+                List.of(jsonPath("accountId").exists( ),
                         jsonPath("name").exists( ),
                         jsonPath("email").exists( ),
                         jsonPath("password").doesNotExist( ),
@@ -220,7 +216,7 @@ class AccountControllerTest {
         정상_200("updatedName", "updated@email.com", "newpassword",
                 List.of(
                         status( ).isOk( ),
-                        jsonPath("id").exists( ),
+                        jsonPath("accountId").exists( ),
                         jsonPath("name").value("updatedName"),
                         jsonPath("email").value("updated@email.com"),
                         jsonPath("password").doesNotExist( )
@@ -229,7 +225,7 @@ class AccountControllerTest {
         이름_변경_200("updatedName", null, "password",
                 List.of(
                         status( ).isOk( ),
-                        jsonPath("id").exists( ),
+                        jsonPath("accountId").exists( ),
                         jsonPath("name").value("updatedName"),
                         jsonPath("email").exists( ),
                         jsonPath("password").doesNotExist( )
@@ -238,7 +234,7 @@ class AccountControllerTest {
         이메일_변경_200(null, "updated@email.com", "password",
                 List.of(
                         status( ).isOk( ),
-                        jsonPath("id").exists( ),
+                        jsonPath("accountId").exists( ),
                         jsonPath("name").exists( ),
                         jsonPath("email").value("updated@email.com"),
                         jsonPath("password").doesNotExist( )
@@ -247,7 +243,7 @@ class AccountControllerTest {
         이메일_비밀번호_변경_200(null, "updated@email.com", "newpassword",
                 List.of(
                         status( ).isOk( ),
-                        jsonPath("id").exists( ),
+                        jsonPath("accountId").exists( ),
                         jsonPath("name").exists( ),
                         jsonPath("email").value("updated@email.com"),
                         jsonPath("password").doesNotExist( )
@@ -288,13 +284,13 @@ class AccountControllerTest {
                         jsonPath("email").value(Constants.NON_DUPLICATE_EMAIL),
                         jsonPath("duplicate").value(false)
                 )
-        ),
-        잘못된_요청_400("non-email-format",
-                List.of(
-                        status( ).isBadRequest( ),
-                        jsonPath("code").value(ErrorCode.FIELD_ERROR.getCode( ))
-                )
         );
+//        잘못된_요청_400("non-email-format",
+//                List.of(
+//                        status( ).isBadRequest( ),
+//                        jsonPath("code").value(ErrorCode.FIELD_ERROR.getCode( ))
+//                )
+//        );
         
         String              email;
         List<ResultMatcher> resultMatchers;

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @MockMvcTest
+@Transactional
 class AuthControllerTest {
     
     @Autowired MockMvc      mockMvc;
@@ -37,7 +39,7 @@ class AuthControllerTest {
         var request = new LoginRequest(WithMockAccount.DEFAULT_EMAIL, WithMockAccount.DEFAULT_PASSWORD);
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken")
+        mockMvc.perform(post("/api/login")
                        .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
@@ -45,7 +47,7 @@ class AuthControllerTest {
                .andExpect(matchAll(
                        status( ).isOk( ),
                        jsonPath("jwt").exists( ),
-                       jsonPath("id").exists( ),
+                       jsonPath("accountId").exists( ),
                        jsonPath("email").exists( ),
                        jsonPath("password").doesNotExist( )
                ));
@@ -57,7 +59,7 @@ class AuthControllerTest {
         var request = new LoginRequest("unregistered@email.com", "password");
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken")
+        mockMvc.perform(post("/api/login")
                        .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
@@ -75,7 +77,7 @@ class AuthControllerTest {
         var request = new LoginRequest(WithMockAccount.DEFAULT_EMAIL, "wrong" + WithMockAccount.DEFAULT_PASSWORD);
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken")
+        mockMvc.perform(post("/api/login")
                        .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
@@ -93,7 +95,7 @@ class AuthControllerTest {
         var jwt = "Bearer " + jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( ));
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken/jwt")
+        mockMvc.perform(post("/api/login/jwt")
                        .header(AUTHORIZATION, jwt)
                )
                .andDo(print( ))
@@ -107,10 +109,10 @@ class AuthControllerTest {
     void jwtLogin_deletedUserJwt( ) throws Exception {
         // given
         var jwt = "Bearer " + jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( ));
-        accountRepository.deleteAll( );
+        accountRepository.deleteByEmail(WithMockAccount.DEFAULT_EMAIL);
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken/jwt")
+        mockMvc.perform(post("/api/login/jwt")
                        .accept(APPLICATION_JSON_UTF8)
                        .header(AUTHORIZATION, jwt)
                )
@@ -123,12 +125,12 @@ class AuthControllerTest {
     
     @Test
     @WithMockAccount
-    void jwtLogin_invalidJwt( ) throws Exception {
+    void jwtLogin_invalidJwt_401( ) throws Exception {
         // given
         var jwt = "Bearer "+ jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( )) + "wrong";
         
         // then
-        mockMvc.perform(post("/api/resolveIdToken/jwt")
+        mockMvc.perform(post("/api/login/jwt")
                        .accept(APPLICATION_JSON_UTF8)
                        .header(AUTHORIZATION, jwt)
                )
