@@ -26,7 +26,7 @@ public class Post extends BaseTimeEntity {
     
     String title;
     
-    @Lob
+    @Column(columnDefinition="TEXT")
     String content;
     
     int viewCount;

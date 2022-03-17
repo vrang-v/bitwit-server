@@ -9,6 +9,7 @@ import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,6 +33,12 @@ public class ExceptionHandlerControllerAdvice {
     public ResponseEntity<BitwitErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         log.error("handleHttpRequestMethodNotSupportedException", e);
         return createErrorResponseEntity(new BitwitException(ErrorCode.METHOD_NOT_SUPPOERTED));
+    }
+    
+    @ExceptionHandler
+    public ResponseEntity<BitwitErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("handleHttpMessageNotReadableException", e);
+        return createErrorResponseEntity(new BitwitException( ErrorCode.EMPTY_REQUEST_BODY));
     }
     
     @ExceptionHandler

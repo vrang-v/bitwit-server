@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -20,6 +19,7 @@ import static com.server.bitwit.domain.QBallot.ballot;
 import static com.server.bitwit.domain.QVote.vote;
 import static com.server.bitwit.util.DynamicQueryUtils.combineWithOr;
 import static com.server.bitwit.util.DynamicQueryUtils.in;
+import static java.time.LocalDateTime.now;
 
 @RequiredArgsConstructor
 @Repository
@@ -40,7 +40,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
     
     @Override
     public List<Vote> findActiveVotes( ) {
-        var now = LocalDateTime.now( );
+        var now = now( );
         return query.selectFrom(vote)
                     .leftJoin(vote.stock).fetchJoin( )
                     .where(

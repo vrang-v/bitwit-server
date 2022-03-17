@@ -60,8 +60,12 @@ public class JwtService {
                        .getBody( )
                        .get(claim.getKey( ), claim.getType( ));
         }
+        catch (MalformedJwtException e) {
+            throw new BitwitException(ErrorCode.INVALID_JWT);
+        }
         catch (Exception e) {
-            throw new BitwitException(ErrorCode.NO_PERMISSION);
+            e.printStackTrace( );
+            throw new BitwitException(ErrorCode.AUTHENTICATION_FAILED);
         }
     }
     

@@ -39,19 +39,17 @@ public class VoteService {
     }
     
     public List<VoteClientResponse> getVotesByAccountIdAndParticipationDate(Long accountId, LocalDate date) {
-        return voteRepository
-                .findAllByAccountIdAndParticipationDate(accountId, date)
-                .stream( )
-                .map(vote -> conversionService.convert(vote, VoteClientResponse.class))
-                .collect(Collectors.toList( ));
+        return voteRepository.findAllByAccountIdAndParticipationDate(accountId, date)
+                             .stream( )
+                             .map(vote -> conversionService.convert(vote, VoteClientResponse.class))
+                             .collect(Collectors.toList( ));
     }
     
     public List<VoteClientResponse> getActiveVotes( ) {
-        return voteRepository
-                .findActiveVotes( )
-                .stream( )
-                .map(vote -> conversionService.convert(vote, VoteClientResponse.class))
-                .collect(toList( ));
+        return voteRepository.findActiveVotes( )
+                             .stream( )
+                             .map(vote -> conversionService.convert(vote, VoteClientResponse.class))
+                             .collect(toList( ));
     }
     
     

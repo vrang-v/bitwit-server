@@ -2,6 +2,7 @@ package com.server.bitwit.infra.email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 
 @Slf4j
+@Profile("!test")
 @RequiredArgsConstructor
 @Service
 public class HtmlEmailService implements EmailService {

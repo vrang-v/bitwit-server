@@ -4,7 +4,11 @@ import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 
 public class ImageFile implements MultipartFile {
     
@@ -63,6 +67,6 @@ public class ImageFile implements MultipartFile {
     
     @Override
     public void transferTo(File dest) throws IOException, IllegalStateException {
-        new FileOutputStream(dest).write(content);
+        transferTo(Path.of(dest.getPath( )));
     }
 }

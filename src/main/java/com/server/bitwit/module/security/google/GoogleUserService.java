@@ -4,7 +4,7 @@ import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Authority;
 import com.server.bitwit.infra.client.google.dto.GoogleUser;
 import com.server.bitwit.module.account.AccountRepository;
-import com.server.bitwit.module.file.FileStorage;
+import com.server.bitwit.infra.storage.StorageService;
 import com.server.bitwit.util.ImageFile;
 import com.server.bitwit.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class GoogleUserService {
     
     private final AccountRepository accountRepository;
     
-    private final FileStorage fileStorage;
+    private final StorageService storageService;
     
     public Authentication loadUser(GoogleUser googleUser) {
         var account   = saveOrUpdate(googleUser);
@@ -50,7 +50,7 @@ public class GoogleUserService {
         var contentType  = response.getHeaders( ).getContentType( ).toString( );
         var imageContent = response.getBody( );
         var imageFile    = new ImageFile(imageContent, fileName, contentType);
-        var uploadFile   = fileStorage.upload(imageFile);
+        var uploadFile   = storageService.upload(imageFile);
         return Account.createOAuthAccount(googleUser.getName( ), googleUser.getEmail( ), GOOGLE)
                       .changeProfileImage(uploadFile);
     }

@@ -24,7 +24,13 @@ public enum ErrorCode {
     
     FIELD_ERROR("C4000", "잘못된 요청 필드가 존재합니다.", BAD_REQUEST),
     
-    REQUEST_LIMIT("C4029", "요청량이 많아 사용이 제한됩니다.", TOO_MANY_REQUESTS),;
+    REQUEST_LIMIT("C4029", "요청량이 많아 사용이 제한됩니다.", TOO_MANY_REQUESTS),
+    
+    FILE_NOT_FOUND("C4004", "요청된 파일이 존재하지 않습니다.", NOT_FOUND),
+    
+    EMPTY_REQUEST_BODY("C4010", "요청 본문이 비어있습니다.", BAD_REQUEST),
+    
+    INVALID_JWT("C4001", "잘못된 JWT 형식입니다.", BAD_REQUEST);
     
     private final String     code;
     private final String     baseMessage;

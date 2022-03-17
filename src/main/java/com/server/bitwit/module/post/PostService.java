@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +45,6 @@ public class PostService {
     
     @Transactional
     public PostResponse updatePost(Long postId, UpdatePostRequest request) {
-        var inputStream         = new ByteArrayInputStream(new byte[] {1, 2, 3});
-        var bufferedInputStream = new BufferedInputStream(inputStream);
         return postRepository.findById(postId)
                              .map(post -> {
                                  if (StringUtils.hasText(request.getTitle( ))) {
@@ -105,6 +101,7 @@ public class PostService {
                              .orElseThrow(( ) -> new NonExistentResourceException("post", postId));
     }
     
+    @Transactional
     public void deletePost(Long postId, Long accountId) {
         postRepository.findWithWriterById(postId)
                       .filter(post -> post.getWriter( ).getId( ).equals(accountId))

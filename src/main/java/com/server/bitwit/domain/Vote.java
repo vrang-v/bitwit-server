@@ -31,7 +31,7 @@ public class Vote extends BaseTimeEntity {
     @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL)
     List<Ballot> ballots;
     
-    @Lob
+    @Column(columnDefinition="TEXT")
     String description;
     
     LocalDateTime startAt;

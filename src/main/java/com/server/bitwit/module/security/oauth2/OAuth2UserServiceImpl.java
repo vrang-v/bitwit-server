@@ -35,7 +35,8 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         
         var account = saveOrUpdate(oAuthAttributes);
         
-        var authorities = account.getAuthorities( ).stream( )
+        var authorities = account.getAuthorities( )
+                                 .stream( )
                                  .map(Authority::getAuthorityName)
                                  .collect(Collectors.joining(","));
         return new OAuth2UserPrincipal(

@@ -41,6 +41,9 @@ public abstract class CreatePostRequestMapper implements Converter<CreatePostReq
     }
     
     private void addStocks(List<String> tickers, Post post) {
+        if (tickers == null) {
+            return;
+        }
         var cond = new SearchStockCond( );
         cond.setTickers(tickers);
         stockRepository.searchStocks(cond)
@@ -48,6 +51,9 @@ public abstract class CreatePostRequestMapper implements Converter<CreatePostReq
     }
     
     private void addTags(List<String> tagNames, Post post) {
+        if (tagNames == null) {
+            return;
+        }
         tagNames.stream( )
                 .map(name ->
                         tagRepository.findByName(name)

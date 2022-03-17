@@ -1,19 +1,21 @@
 package com.server.bitwit.module.account;
 
-import com.server.bitwit.domain.AccountType;
-import com.server.bitwit.module.account.dto.*;
-import com.server.bitwit.module.error.exception.BitwitException;
-import com.server.bitwit.module.error.exception.ErrorCode;
+import com.server.bitwit.module.account.dto.AccountResponse;
+import com.server.bitwit.module.account.dto.CreateEmailAccountRequest;
+import com.server.bitwit.module.account.dto.DuplicateCheckResponse;
+import com.server.bitwit.module.account.dto.UpdateAccountRequest;
 import com.server.bitwit.module.security.jwt.support.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.core.io.Resource;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.net.MalformedURLException;
+import javax.validation.constraints.Email;
 
+import static com.server.bitwit.domain.AccountType.EMAIL;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequiredArgsConstructor
@@ -40,7 +42,7 @@ public class AccountController {
     }
     
     @GetMapping(path = "/me/profile-image", produces = "image/jpeg")
-    public Resource getProfileImage(@Jwt Long accountId) throws MalformedURLException {
+    public Resource getProfileImage(@Jwt Long accountId) {
         return accountService.getProfileImage(accountId);
     }
     
@@ -49,18 +51,14 @@ public class AccountController {
         return accountService.updateAccount(accountId, request);
     }
     
-    @GetMapping("/duplicate-check")
-    public DuplicateCheckResponse checkForDuplicateEmail(@Valid @ModelAttribute DuplicateCheckRequest request) {
-        boolean result;
-        if (request.getEmail( ) != null) {
-            result = accountService.existsByEmailAndAccountType(request.getEmail( ), AccountType.EMAIL);
-            return DuplicateCheckResponse.email(request.getEmail( ), result);
-        }
-        if (request.getName( ) != null) {
-            result = accountService.existsByName(request.getName( ));
-            return DuplicateCheckResponse.name(request.getName( ), result);
-        }
-        throw new BitwitException(ErrorCode.INVALID_REQUEST);
+    @GetMapping("/duplicate-check/email")
+    public DuplicateCheckResponse checkForDuplicateEmail(@Email @Validated @RequestParam String email) {
+        return DuplicateCheckResponse.email(email, accountService.existsByEmailAndAccountType(email, EMAIL));
+    }
+    
+    @GetMapping("/duplicate-check/name")
+    public DuplicateCheckResponse checkForDuplicateName(@RequestParam String name) {
+        return DuplicateCheckResponse.name(name, accountService.existsByName(name));
     }
     
     @GetMapping("/email-verified-check")
