@@ -40,3 +40,7 @@ out/
 ### Config File ###
 src/main/resources/application.yml
 src/main/resources/application-oauth.yml
+
+### KEY STORE ###
+keystore.jks
+truststore.jks
