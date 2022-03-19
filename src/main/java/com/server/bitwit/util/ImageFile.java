@@ -56,12 +56,12 @@ public class ImageFile implements MultipartFile {
     }
     
     @Override
-    public byte[] getBytes( ) throws IOException {
+    public byte[] getBytes( ) {
         return content;
     }
     
     @Override
-    public InputStream getInputStream( ) throws IOException {
+    public InputStream getInputStream( ) {
         return new ByteArrayInputStream(content);
     }
     

@@ -17,9 +17,4 @@ public class BithumbScheduler {
     public void updateRealTimePriceTask( ) {
         bithumbService.updateAllRealTimePrice( );
     }
-    
-    //@Scheduled(fixedDelay = 86400000)
-    public void updateBithumb24hCandlestickChart( ) {
-        bithumbService.get24hCandleStickChart( );
-    }
 }

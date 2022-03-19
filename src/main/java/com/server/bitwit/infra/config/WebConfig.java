@@ -20,7 +20,6 @@ public class WebConfig implements WebMvcConfigurer {
     private final LoggingInterceptor  loggingInterceptor;
     private final JwtArgumentResolver jwtArgumentResolver;
     
-    
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
