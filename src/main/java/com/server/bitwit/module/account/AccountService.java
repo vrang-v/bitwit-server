@@ -3,6 +3,7 @@ package com.server.bitwit.module.account;
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.AccountType;
 import com.server.bitwit.domain.UploadFile;
+import com.server.bitwit.infra.storage.StorageService;
 import com.server.bitwit.module.account.dto.AcceptSignUpRequest;
 import com.server.bitwit.module.account.dto.AccountResponse;
 import com.server.bitwit.module.account.dto.CreateEmailAccountRequest;
@@ -11,7 +12,7 @@ import com.server.bitwit.module.common.service.EmailService;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
-import com.server.bitwit.infra.storage.StorageService;
+import com.server.bitwit.module.file.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
@@ -71,7 +72,7 @@ public class AccountService {
     
     @Transactional
     public AccountResponse changeProfileImage(Long accountId, MultipartFile profileImage) {
-        var uploadFile = storageService.upload(profileImage);
+        var uploadFile = storageService.upload(new MultipartFileResource(profileImage));
         var account = accountRepository.findById(accountId)
                                        .orElseThrow(( ) -> new NonExistentResourceException("account", accountId))
                                        .changeProfileImage(uploadFile);

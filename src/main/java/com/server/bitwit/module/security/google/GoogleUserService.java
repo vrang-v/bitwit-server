@@ -3,9 +3,9 @@ package com.server.bitwit.module.security.google;
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Authority;
 import com.server.bitwit.infra.client.google.dto.GoogleUser;
-import com.server.bitwit.module.account.AccountRepository;
 import com.server.bitwit.infra.storage.StorageService;
-import com.server.bitwit.util.ImageFile;
+import com.server.bitwit.module.account.AccountRepository;
+import com.server.bitwit.util.NamedByteArrayResource;
 import com.server.bitwit.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -47,10 +47,8 @@ public class GoogleUserService {
     private Account createGoogleAccount(GoogleUser googleUser) {
         var response     = new RestTemplate( ).getForEntity(googleUser.getPicture( ), byte[].class);
         var fileName     = StringUtils.getLastElement(googleUser.getPicture( ), "/");
-        var contentType  = response.getHeaders( ).getContentType( ).toString( );
         var imageContent = response.getBody( );
-        var imageFile    = new ImageFile(imageContent, fileName, contentType);
-        var uploadFile   = storageService.upload(imageFile);
+        var uploadFile   = storageService.upload(new NamedByteArrayResource(fileName, imageContent));
         return Account.createOAuthAccount(googleUser.getName( ), googleUser.getEmail( ), GOOGLE)
                       .changeProfileImage(uploadFile);
     }
