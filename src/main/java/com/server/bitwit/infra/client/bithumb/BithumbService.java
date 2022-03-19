@@ -25,21 +25,10 @@ public class BithumbService {
         this.webClient             = webClientBuilder.baseUrl(bithumbProperties.getBaseUrl( )).build( );
     }
     
-    public void updateRealTimePrice( ) {
+    public void updateAllRealTimePrice( ) {
         var tickerMap = bithumbProperties.getTickerMap( );
         tickerMap.keySet( ).forEach(ticker -> {
-            var uri = bithumbProperties.getTickerInfoUri( ) + "/" + tickerMap.get(ticker);
-            webClient.get( )
-                     .uri(uri)
-                     .retrieve( )
-                     .bodyToMono(BithumbTickerInfoResponse.class)
-                     .map(response -> {
-                         var currentPrice  = response.getData( ).getClosingPrice( );
-                         var fluctuate     = response.getData( ).getFluctuate24h( );
-                         var fluctuateRate = response.getData( ).getFluctuateRate24h( );
-                         return new UpdateRealTimeInfoRequest(ticker, currentPrice, fluctuate, fluctuateRate);
-                     })
-                     .subscribe(stockService::updateRealTimeInfo);
+            updateRealTimePrice(ticker);
             try {
                 Thread.sleep(10L);
             }
@@ -48,6 +37,22 @@ public class BithumbService {
                 throw new BitwitException(e.getMessage( ));
             }
         });
+    }
+    
+    public void updateRealTimePrice(String ticker) {
+        var tickerMap = bithumbProperties.getTickerMap( );
+        var uri       = bithumbProperties.getTickerInfoUri( ) + "/" + tickerMap.get(ticker);
+        webClient.get( )
+                 .uri(uri)
+                 .retrieve( )
+                 .bodyToMono(BithumbTickerInfoResponse.class)
+                 .map(response -> {
+                     var currentPrice  = response.getData( ).getClosingPrice( );
+                     var fluctuate     = response.getData( ).getFluctuate24h( );
+                     var fluctuateRate = response.getData( ).getFluctuateRate24h( );
+                     return new UpdateRealTimeInfoRequest(ticker, currentPrice, fluctuate, fluctuateRate);
+                 })
+                 .subscribe(stockService::updateRealTimeInfo, e -> { throw new BitwitException(e.getMessage( )); });
     }
     
     public void get24hCandleStickChart( ) {
