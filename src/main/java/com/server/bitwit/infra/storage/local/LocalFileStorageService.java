@@ -48,6 +48,6 @@ public class LocalFileStorageService implements StorageService {
     }
     
     public Path getAbsolutePath(String uploadFileName) {
-        return Path.of("C:\\Users\\pc\\Desktop\\bitwit\\bitwit-server\\image\\", uploadFileName);
+        return Path.of("C:\\Users\\pc\\Desktop\\bitwit\\bitwit-server\\storage\\", uploadFileName);
     }
 }

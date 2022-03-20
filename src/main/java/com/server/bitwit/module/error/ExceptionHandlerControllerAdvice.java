@@ -38,18 +38,18 @@ public class ExceptionHandlerControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<BitwitErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.error("handleHttpMessageNotReadableException", e);
-        return createErrorResponseEntity(new BitwitException( ErrorCode.EMPTY_REQUEST_BODY));
+        return createErrorResponseEntity(new BitwitException(ErrorCode.EMPTY_REQUEST_BODY));
     }
     
     @ExceptionHandler
     public ResponseEntity<BitwitErrorResponse> handleAuthenticationException(AuthenticationException e) {
-        log.warn("handleAuthenticationException", e);
+        log.warn("handleAuthenticationException {}", e.getMessage( ));
         return createErrorResponseEntity(new BitwitException(ErrorCode.AUTHENTICATION_FAILED));
     }
     
     @ExceptionHandler
     public ResponseEntity<BitwitErrorResponse> handleJwtException(JwtException e) {
-        log.warn("handleJwtException", e);
+        log.warn("handleJwtException {}", e.getMessage( ));
         return createErrorResponseEntity(new BitwitException(ErrorCode.AUTHENTICATION_FAILED));
     }
     

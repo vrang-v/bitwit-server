@@ -83,7 +83,7 @@ public class AccountService {
     public Account acceptSignUp(AcceptSignUpRequest request) {
         return accountRepository.findByEmailAndAccountType(request.getEmail( ), AccountType.EMAIL)
                                 .filter(account -> request.getToken( ).equals(account.getEmailToken( )))
-                                .map(Account::verify)
+                                .map(Account::convertToVerified)
                                 .orElse(null);
     }
     

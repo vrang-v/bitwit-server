@@ -5,10 +5,8 @@ import com.server.bitwit.domain.Post;
 import com.server.bitwit.domain.Stock;
 import com.server.bitwit.infra.schedule.VoteCreationScheduler;
 import com.server.bitwit.module.account.AccountRepository;
-import com.server.bitwit.module.account.AccountService;
 import com.server.bitwit.module.post.PostRepository;
 import com.server.bitwit.module.stock.StockRepository;
-import com.server.bitwit.module.vote.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -52,9 +50,9 @@ public class InitDatasource {
                    .forEach(stockRepository::save);
         }
         
-        var account1 = Account.createEmailAccount("vrang", "mingi06171@naver.com", "1234qwer").verify( );
-        var account2 = Account.createEmailAccount("민트초코", "tlsalsrl0617@naver.com", "1234qwer").verify( );
-        var account3 = Account.createEmailAccount("초코찐빵", "mingi000617@naver.com", "1234qwer").verify( );
+        var account1 = Account.createEmailAccount("vrang", "mingi06171@naver.com", "1234qwer").convertToVerified( );
+        var account2 = Account.createEmailAccount("민트초코", "tlsalsrl0617@naver.com", "1234qwer").convertToVerified( );
+        var account3 = Account.createEmailAccount("초코찐빵", "mingi000617@naver.com", "1234qwer").convertToVerified( );
         accountRepository.save(account1);
         accountRepository.save(account2);
         accountRepository.save(account3);

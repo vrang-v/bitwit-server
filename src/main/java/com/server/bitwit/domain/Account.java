@@ -104,7 +104,7 @@ public class Account extends BaseTimeEntity {
         return this;
     }
     
-    public Account verify( ) {
+    public Account convertToVerified( ) {
         this.joinedAt      = LocalDateTime.now( );
         this.emailVerified = true;
         this.emailToken    = null;
