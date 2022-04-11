@@ -9,6 +9,7 @@ import com.server.bitwit.module.stock.dto.StockResponse;
 import com.server.bitwit.module.stock.dto.UpdateRealTimeInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,10 +42,15 @@ public class StockService {
     
     public List<StockResponse> searchStocks(SearchStockCond cond, Pageable pageable) {
         return stockRepository
-                .searchStocks(cond)
+                .searchStockPage(cond, pageable)
                 .stream( )
                 .map(stock -> conversionService.convert(stock, StockResponse.class))
                 .collect(Collectors.toList( ));
+    }
+    
+    public Page<StockResponse> searchStockPage(SearchStockCond cond, Pageable pageable) {
+        return stockRepository.searchStockPage(cond, pageable)
+                              .map(stock -> conversionService.convert(stock, StockResponse.class));
     }
     
     public Optional<Stock> findById(Long stockId) {

@@ -9,10 +9,13 @@ import com.server.bitwit.module.vote.dto.VoteItemResponse;
 import com.server.bitwit.module.vote.search.VoteSearchCond;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,8 +57,8 @@ public class VoteService {
     
     
     public <T> T searchVote(VoteSearchCond cond, Class<T> responseType) {
-        var participated    = voteRepository.findAllParticipated(cond).stream( );
-        var notParticipated = voteRepository.findAllNotParticipated(cond).stream( ).map(Vote::hideBallots);
+        var participated    = voteRepository.searchAllParticipated(cond).stream( );
+        var notParticipated = voteRepository.searchAllNotParticipated(cond).stream( ).map(Vote::hideBallots);
         return Stream.concat(participated, notParticipated)
                      .map(vote -> conversionService.convert(vote, responseType))
                      .findFirst( )
@@ -63,13 +66,24 @@ public class VoteService {
     }
     
     public <T> List<T> searchVotes(VoteSearchCond cond, Class<T> responseType) {
-        var participated    = voteRepository.findAllParticipated(cond).stream( );
-        var notParticipated = voteRepository.findAllNotParticipated(cond).stream( ).map(Vote::hideBallots);
+        var participated    = voteRepository.searchAllParticipated(cond).stream( );
+        var notParticipated = voteRepository.searchAllNotParticipated(cond).stream( ).map(Vote::hideBallots);
         return Stream.concat(participated, notParticipated)
                      .map(vote -> conversionService.convert(vote, responseType))
                      .collect(Collectors.toList( ));
     }
     
+    public <T> Page<T> searchActiveVotes(VoteSearchCond cond, Class<T> responseType, Pageable pageable) {
+        var currentTime  = LocalDateTime.now( );
+        var votes        = voteRepository.searchActiveVotePage(cond, pageable, currentTime);
+        var participated = voteRepository.searchAllActiveVotesParticipated(cond, currentTime);
+        return votes.map(vote -> {
+            if (participated.contains(vote)) {
+                vote.hideBallots( );
+            }
+            return conversionService.convert(vote, responseType);
+        });
+    }
     
     public Optional<Vote> findById(Long voteId) {
         return voteRepository.findWithStockById(voteId);

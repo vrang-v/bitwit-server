@@ -5,6 +5,8 @@ import com.server.bitwit.module.vote.dto.*;
 import com.server.bitwit.module.vote.search.VoteSearchCond;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,11 @@ public class VoteController {
         return voteService.searchVotes(cond.withAccountId(accountId), responseType.getResponseType( ));
     }
     
+    @GetMapping("/search/page/type/{responseType}")
+    public Page<? extends VoteResponse> searchVotePage(@Jwt Long accountId, @ModelAttribute VoteSearchCond cond, @PathVariable VoteResponseType responseType, Pageable pageable) {
+        return voteService.searchActiveVotes(cond.withAccountId(accountId), responseType.getResponseType( ), pageable);
+    }
+    
     @GetMapping("/{voteId}")
     public VoteDefaultResponse getVote(@Jwt Long accountId, @PathVariable Long voteId) {
         var cond = VoteSearchCond.builder( ).accountId(accountId).voteIds(List.of(voteId)).build( );
@@ -54,7 +61,6 @@ public class VoteController {
     public List<? extends VoteResponse> getVotes(@Jwt Long accountId, @PathVariable VoteResponseType responseType) {
         return voteService.searchVotes(new VoteSearchCond( ).withAccountId(accountId), responseType.getResponseType( ));
     }
-    
     
     
     @GetMapping("/status/active")

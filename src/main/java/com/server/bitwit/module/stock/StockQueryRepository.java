@@ -11,5 +11,5 @@ public interface StockQueryRepository {
     
     List<Stock> searchStocks(SearchStockCond cond);
     
-    Page<Stock> searchStocks(SearchStockCond cond, Pageable pageable);
+    Page<Stock> searchStockPage(SearchStockCond cond, Pageable pageable);
 }

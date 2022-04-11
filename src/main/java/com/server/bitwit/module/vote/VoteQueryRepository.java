@@ -2,8 +2,11 @@ package com.server.bitwit.module.vote;
 
 import com.server.bitwit.domain.Vote;
 import com.server.bitwit.module.vote.search.VoteSearchCond;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +18,12 @@ public interface VoteQueryRepository {
     
     List<Vote> findActiveVotes( );
     
-    List<Vote> findAllParticipated(VoteSearchCond cond);
+    List<Vote> searchAllParticipated(VoteSearchCond cond);
     
-    List<Vote> findAllNotParticipated(VoteSearchCond cond);
+    List<Vote> searchAllNotParticipated(VoteSearchCond cond);
+    
+    Page<Vote> searchActiveVotePage(VoteSearchCond cond, Pageable pageable, LocalDateTime currentTime);
+    
+    List<Vote> searchAllActiveVotesParticipated(VoteSearchCond cond, LocalDateTime currentTime);
     
 }

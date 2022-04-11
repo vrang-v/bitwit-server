@@ -5,13 +5,11 @@ import com.server.bitwit.module.error.exception.InvalidRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
@@ -21,6 +19,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Entity
 public class Vote extends BaseTimeEntity {
+    
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "vote_id")
     Long id;
@@ -109,5 +108,18 @@ public class Vote extends BaseTimeEntity {
     public Vote hideBallots( ) {
         ballots = null;
         return this;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) { return false; }
+        Vote vote = (Vote)o;
+        return id != null && Objects.equals(id, vote.id);
+    }
+    
+    @Override
+    public int hashCode( ) {
+        return getClass( ).hashCode( );
     }
 }

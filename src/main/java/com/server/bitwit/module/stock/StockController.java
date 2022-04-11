@@ -4,8 +4,8 @@ import com.server.bitwit.module.stock.dto.CreateStockRequest;
 import com.server.bitwit.module.stock.dto.SearchStockCond;
 import com.server.bitwit.module.stock.dto.StockResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,7 +32,12 @@ public class StockController {
     }
     
     @GetMapping("/search")
-    public List<StockResponse> searchStock(@ModelAttribute SearchStockCond cond, @PageableDefault Pageable pageable) {
+    public List<StockResponse> searchStock(@ModelAttribute SearchStockCond cond, Pageable pageable) {
         return stockService.searchStocks(cond, pageable);
+    }
+    
+    @GetMapping("/search/page")
+    public Page<StockResponse> searchStockPage(@ModelAttribute SearchStockCond cond, Pageable pageable) {
+        return stockService.searchStockPage(cond, pageable);
     }
 }

@@ -36,7 +36,7 @@ public class StockQueryRepositoryImpl extends QuerydslRepositoryBase implements 
     }
     
     @Override
-    public Page<Stock> searchStocks(SearchStockCond cond, Pageable pageable) {
+    public Page<Stock> searchStockPage(SearchStockCond cond, Pageable pageable) {
         return paginate(pageable,
                 selectFrom(stock)
                         .where(
