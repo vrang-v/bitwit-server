@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.server.bitwit.util.PageUtils.getSort;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
@@ -83,6 +84,20 @@ public class VoteService {
             }
             return conversionService.convert(vote, responseType);
         });
+    }
+    
+    public <T> List<T> searchActiveVotesWithOffset(VoteSearchCond cond, String sort, int offset, int limit, Class<T> responseType) {
+        var currentTime  = LocalDateTime.now( );
+        var votes        = voteRepository.searchActiveVoteWithOffset(cond, getSort(sort), offset, limit, currentTime);
+        var participated = voteRepository.searchAllActiveVotesParticipated(cond, currentTime);
+        return votes.stream( )
+                    .map(vote -> {
+                        if (participated.contains(vote)) {
+                            vote.hideBallots( );
+                        }
+                        return conversionService.convert(vote, responseType);
+                    })
+                    .collect(toList( ));
     }
     
     public Optional<Vote> findById(Long voteId) {

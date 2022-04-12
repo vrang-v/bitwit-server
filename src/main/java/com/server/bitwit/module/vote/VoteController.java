@@ -35,8 +35,22 @@ public class VoteController {
         return voteService.searchVotes(cond.withAccountId(accountId), responseType.getResponseType( ));
     }
     
+    @GetMapping("/search/v2/type/{responseType}")
+    public List<? extends VoteResponse> searchActiveVotePage(
+            @Jwt Long accountId,
+            @ModelAttribute VoteSearchCond cond,
+            @PathVariable VoteResponseType responseType,
+            @RequestParam("sort") String sort,
+            @RequestParam("offset") String offset,
+            @RequestParam("limit") String limit
+    ) {
+        return voteService.searchActiveVotesWithOffset(
+                cond.withAccountId(accountId), sort, Integer.parseInt(offset), Integer.parseInt(limit), responseType.getResponseType( )
+        );
+    }
+    
     @GetMapping("/search/page/type/{responseType}")
-    public Page<? extends VoteResponse> searchVotePage(@Jwt Long accountId, @ModelAttribute VoteSearchCond cond, @PathVariable VoteResponseType responseType, Pageable pageable) {
+    public Page<? extends VoteResponse> searchActiveVotePage(@Jwt Long accountId, @ModelAttribute VoteSearchCond cond, @PathVariable VoteResponseType responseType, Pageable pageable) {
         return voteService.searchActiveVotes(cond.withAccountId(accountId), responseType.getResponseType( ), pageable);
     }
     

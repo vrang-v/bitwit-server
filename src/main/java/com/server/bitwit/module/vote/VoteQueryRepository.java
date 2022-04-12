@@ -4,6 +4,7 @@ import com.server.bitwit.domain.Vote;
 import com.server.bitwit.module.vote.search.VoteSearchCond;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,5 +26,7 @@ public interface VoteQueryRepository {
     Page<Vote> searchActiveVotePage(VoteSearchCond cond, Pageable pageable, LocalDateTime currentTime);
     
     List<Vote> searchAllActiveVotesParticipated(VoteSearchCond cond, LocalDateTime currentTime);
+    
+    List<Vote> searchActiveVoteWithOffset(VoteSearchCond cond, Sort sort, int offset, int limit, LocalDateTime currentTime);
     
 }

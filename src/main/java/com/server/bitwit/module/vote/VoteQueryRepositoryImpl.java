@@ -6,6 +6,7 @@ import com.server.bitwit.module.vote.search.VoteSearchCond;
 import com.server.bitwit.util.QuerydslRepositoryBase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -137,6 +138,27 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
                         account.id.eq(accountId),
                         ballot.createdAt.between(from, to)
                 )
+                .fetch( );
+    }
+    
+    @Override
+    public List<Vote> searchActiveVoteWithOffset(VoteSearchCond cond, Sort sort, int offset, int limit, LocalDateTime currentTime) {
+        return getQuerydsl( )
+                .applySorting(sort,
+                        selectFrom(vote)
+                                .innerJoin(vote.stock).fetchJoin( )
+                                .innerJoin(vote.ballots, ballot)
+                                .where(
+                                        combineWithOr(
+                                                in(vote.id, cond.getVoteIds( )),
+                                                in(vote.stock.ticker, cond.getTickers( )),
+                                                in(vote.stock.id, cond.getStockIds( ))
+                                        ),
+                                        vote.startAt.before(currentTime),
+                                        vote.endedAt.after(currentTime)
+                                )
+                                .offset(offset)
+                                .limit(limit))
                 .fetch( );
     }
 }
