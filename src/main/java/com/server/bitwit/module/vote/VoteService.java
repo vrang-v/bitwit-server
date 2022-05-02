@@ -79,7 +79,7 @@ public class VoteService {
         var votes        = voteRepository.searchActiveVotePage(cond, pageable, currentTime);
         var participated = voteRepository.searchAllActiveVotesParticipated(cond, currentTime);
         return votes.map(vote -> {
-            if (participated.contains(vote)) {
+            if (! participated.contains(vote)) {
                 vote.hideBallots( );
             }
             return conversionService.convert(vote, responseType);
@@ -92,7 +92,7 @@ public class VoteService {
         var participated = voteRepository.searchAllActiveVotesParticipated(cond, currentTime);
         return votes.stream( )
                     .map(vote -> {
-                        if (participated.contains(vote)) {
+                        if (! participated.contains(vote)) {
                             vote.hideBallots( );
                         }
                         return conversionService.convert(vote, responseType);

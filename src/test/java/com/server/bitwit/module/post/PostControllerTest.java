@@ -20,7 +20,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,7 +54,6 @@ class PostControllerTest {
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andDo(print( ))
                .andExpect(matchAll(
                        status( ).isCreated( ),
                        jsonPath("$.postId").exists( ),
@@ -80,18 +78,21 @@ class PostControllerTest {
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andDo(print( ))
                .andExpect(matchAll(
                        status( ).isCreated( )
                ));
     }
     
     @Test
+    @WithMockAccount
     void search( ) throws Exception {
         mockMvc.perform(get("/api/posts/search")
                        .accept(APPLICATION_JSON_UTF8)
+                       .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                        .param("ticker", "BTC")
                )
-               .andDo(print( ));
+               .andExpect(matchAll(
+                       status( ).isOk( )
+               ));
     }
 }

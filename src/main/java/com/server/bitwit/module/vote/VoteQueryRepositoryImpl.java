@@ -1,5 +1,6 @@
 package com.server.bitwit.module.vote;
 
+import com.querydsl.jpa.JPQLQuery;
 import com.server.bitwit.domain.QVote;
 import com.server.bitwit.domain.Vote;
 import com.server.bitwit.module.vote.search.VoteSearchCond;
@@ -95,7 +96,7 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
         return paginate(pageable,
                 selectFrom(vote)
                         .innerJoin(vote.stock).fetchJoin( )
-                        .innerJoin(vote.ballots, ballot)
+                        .leftJoin(vote.ballots, ballot)
                         .where(
                                 combineWithOr(
                                         in(vote.id, cond.getVoteIds( )),
@@ -127,6 +128,28 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     }
     
     @Override
+    public List<Vote> searchActiveVoteWithOffset(VoteSearchCond cond, Sort sort, int offset, int limit, LocalDateTime currentTime) {
+        JPQLQuery<Vote> query = selectFrom(vote)
+                .innerJoin(vote.stock).fetchJoin( )
+                .leftJoin(vote.ballots, ballot)
+                .where(
+                        combineWithOr(
+                                in(vote.id, cond.getVoteIds( )),
+                                in(vote.stock.ticker, cond.getTickers( )),
+                                in(vote.stock.id, cond.getStockIds( ))
+                        ),
+                        vote.startAt.before(currentTime),
+                        vote.endedAt.after(currentTime)
+                )
+                .offset(offset)
+                .limit(limit);
+        if (sort != null) {
+            query = getQuerydsl( ).applySorting(sort, query);
+        }
+        return query.fetch( );
+    }
+    
+    @Override
     public List<Vote> findAllByAccountIdAndParticipationDate(Long accountId, LocalDate date) {
         var from = date.atStartOfDay( ).toInstant(ZoneOffset.UTC);
         var to   = from.plus(1, ChronoUnit.DAYS);
@@ -138,27 +161,6 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
                         account.id.eq(accountId),
                         ballot.createdAt.between(from, to)
                 )
-                .fetch( );
-    }
-    
-    @Override
-    public List<Vote> searchActiveVoteWithOffset(VoteSearchCond cond, Sort sort, int offset, int limit, LocalDateTime currentTime) {
-        return getQuerydsl( )
-                .applySorting(sort,
-                        selectFrom(vote)
-                                .innerJoin(vote.stock).fetchJoin( )
-                                .innerJoin(vote.ballots, ballot)
-                                .where(
-                                        combineWithOr(
-                                                in(vote.id, cond.getVoteIds( )),
-                                                in(vote.stock.ticker, cond.getTickers( )),
-                                                in(vote.stock.id, cond.getStockIds( ))
-                                        ),
-                                        vote.startAt.before(currentTime),
-                                        vote.endedAt.after(currentTime)
-                                )
-                                .offset(offset)
-                                .limit(limit))
                 .fetch( );
     }
 }

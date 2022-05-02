@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface StorageService {
     
-    UploadFile upload(Resource resource);
+    UploadFile upload(String fileName, byte[] content);
     
     Resource download(String filename);
     

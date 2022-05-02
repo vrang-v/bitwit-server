@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
@@ -61,10 +62,9 @@ public class AccountService {
     @Transactional
     public AccountResponse updateAccount(Long accountId, UpdateAccountRequest request) {
         return accountRepository.findById(accountId)
-                                .map(account ->
-                                        account.changeName(request.getName( ))
-                                               .changeEmail(request.getEmail( ))
-                                               .changePassword(request.getPassword( ))
+                                .map(account -> account.changeName(request.getName( ))
+                                                       .changeEmail(request.getEmail( ))
+                                                       .changePassword(request.getPassword( ))
                                 )
                                 .map(account -> conversionService.convert(account, AccountResponse.class))
                                 .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
@@ -72,11 +72,16 @@ public class AccountService {
     
     @Transactional
     public AccountResponse changeProfileImage(Long accountId, MultipartFile profileImage) {
-        var uploadFile = storageService.upload(new MultipartFileResource(profileImage));
-        var account = accountRepository.findById(accountId)
-                                       .orElseThrow(( ) -> new NonExistentResourceException("account", accountId))
-                                       .changeProfileImage(uploadFile);
-        return conversionService.convert(account, AccountResponse.class);
+        try {
+            var uploadFile = storageService.upload(profileImage.getOriginalFilename( ), profileImage.getBytes( ));
+            return accountRepository.findById(accountId)
+                                    .map(account -> account.changeProfileImage(uploadFile))
+                                    .map(account -> conversionService.convert(account, AccountResponse.class))
+                                    .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
+        }
+        catch (IOException e) {
+            throw new BitwitException(e);
+        }
     }
     
     @Transactional

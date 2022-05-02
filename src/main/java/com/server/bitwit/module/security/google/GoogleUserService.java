@@ -5,7 +5,8 @@ import com.server.bitwit.domain.Authority;
 import com.server.bitwit.infra.client.google.dto.GoogleUser;
 import com.server.bitwit.infra.storage.StorageService;
 import com.server.bitwit.module.account.AccountRepository;
-import com.server.bitwit.util.NamedByteArrayResource;
+import com.server.bitwit.module.error.exception.BitwitException;
+import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -47,9 +48,18 @@ public class GoogleUserService {
     private Account createGoogleAccount(GoogleUser googleUser) {
         var response     = new RestTemplate( ).getForEntity(googleUser.getPicture( ), byte[].class);
         var fileName     = StringUtils.getLastElement(googleUser.getPicture( ), "/");
+        var extension    = getImageFileExtension(response.getHeaders( ).getContentType( ).toString( ));
         var imageContent = response.getBody( );
-        var uploadFile   = storageService.upload(new NamedByteArrayResource(fileName, imageContent));
+        var uploadFile   = storageService.upload(fileName + "." + extension, imageContent);
         return Account.createOAuthAccount(googleUser.getName( ), googleUser.getEmail( ), GOOGLE)
                       .changeProfileImage(uploadFile);
+    }
+    
+    private String getImageFileExtension(String contentType) {
+        String[] split = contentType.split("/");
+        if (! split[0].equals("image")) {
+            throw new BitwitException(ErrorCode.FIELD_ERROR, "Not an image: " + contentType);
+        }
+        return split[1];
     }
 }

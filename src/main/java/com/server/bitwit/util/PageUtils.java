@@ -9,7 +9,7 @@ public abstract class PageUtils {
     
     public static Sort getSort(String sort) {
         if (sort == null) {
-            throw new NullPointerException("sort parameter is null");
+            return null;
         }
         var split = sort.split(",");
         if (split.length != 2) {

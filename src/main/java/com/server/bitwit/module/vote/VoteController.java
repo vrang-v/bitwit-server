@@ -40,12 +40,13 @@ public class VoteController {
             @Jwt Long accountId,
             @ModelAttribute VoteSearchCond cond,
             @PathVariable VoteResponseType responseType,
-            @RequestParam("sort") String sort,
-            @RequestParam("offset") String offset,
-            @RequestParam("limit") String limit
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false, defaultValue = "0") String offset,
+            @RequestParam(required = false, defaultValue = "20") String limit
     ) {
         return voteService.searchActiveVotesWithOffset(
-                cond.withAccountId(accountId), sort, Integer.parseInt(offset), Integer.parseInt(limit), responseType.getResponseType( )
+                cond.withAccountId(accountId), sort, Integer.parseInt(offset), Integer.parseInt(limit),
+                responseType.getResponseType( )
         );
     }
     

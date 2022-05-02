@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum Authority
-{
+public enum Authority {
+    
     ADMIN("ROLE_ADMIN"),
     USER("ROLE_USER");
     

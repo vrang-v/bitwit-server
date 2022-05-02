@@ -1,33 +1,20 @@
 package com.server.bitwit.module.vote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.bitwit.domain.VotingOption;
 import com.server.bitwit.module.account.AccountService;
 import com.server.bitwit.module.ballot.BallotService;
-import com.server.bitwit.module.ballot.dto.CreateOrChangeBallotRequest;
-import com.server.bitwit.module.security.AccountPrincipal;
 import com.server.bitwit.module.stock.StockService;
-import com.server.bitwit.module.stock.dto.CreateStockRequest;
-import com.server.bitwit.module.vote.dto.CreateVoteRequest;
 import com.server.bitwit.util.MockJwt;
 import com.server.bitwit.util.MockMvcTest;
 import com.server.bitwit.util.WithMockAccount;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static java.time.LocalDateTime.now;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +32,18 @@ class VoteControllerTest {
     @Autowired VoteService       voteService;
     @Autowired ConversionService conversionService;
     
+    @Test
+    @WithMockAccount
+    void votePageTest( ) throws Exception {
+        mockMvc.perform(get("/api/votes/search/page/type/vote-item")
+                       .header("Authorization", mockJwt.getBearerToken( ))
+                       .header("Accept", MediaType.APPLICATION_JSON_UTF8)
+                       .param("size", "10")
+               )
+               .andDo(print( ))
+               .andExpect(status( ).isOk( ));
+    }
+
 //    @Test
 //    @DisplayName("")
 //    void createVote( ) throws Exception {
