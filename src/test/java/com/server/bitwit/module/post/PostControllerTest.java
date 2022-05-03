@@ -1,12 +1,10 @@
 package com.server.bitwit.module.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.bitwit.module.account.AccountService;
 import com.server.bitwit.module.post.dto.CreatePostRequest;
 import com.server.bitwit.util.MockJwt;
 import com.server.bitwit.util.MockMvcTest;
 import com.server.bitwit.util.WithMockAccount;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,13 +28,6 @@ class PostControllerTest {
     @Autowired MockMvc      mockMvc;
     @Autowired MockJwt      mockJwt;
     @Autowired ObjectMapper objectMapper;
-    
-    @Autowired AccountService accountService;
-    
-    @AfterEach
-    void tearDown( ) {
-        accountService.deleteByEmail(WithMockAccount.DEFAULT_EMAIL);
-    }
     
     @Test
     @WithMockAccount
