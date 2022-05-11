@@ -1,0 +1,7 @@
+steps:
+  - name:       gradle:7.4.2-jdk8
+    entrypoint: gradle
+    args: [ "build" ]
+  - name: gcr.io/cloud-builders/docker
+    args: [ "build", "-t", "gcr.io/bitwit/bitwit-server", "--build-arg=JAR_FILE=build/libs/bitwit-0.0.1-SNAPSHOT.jar", "." ]
+images: [ "gcr.io/bitwit/bitwit-server" ]
