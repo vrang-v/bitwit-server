@@ -1,13 +1,11 @@
 language: java
 jdk:      openjdk11
-
 services:
   - docker
-
 before_install:
+  - openssl aes-256-cbc -K $encrypted_0da0d931fe62_key -iv $encrypted_0da0d931fe62_iv -in application.tar.gz.enc -out application.tar.gz -d
   - openssl aes-256-cbc -K $encrypted_5c967de37745_key -iv $encrypted_5c967de37745_iv -in application.tar.enc -out application.tar -d
   - ls -la
-  - tar xvf ./application.tar
+  - tar -zxvf ./application.tar.gz
   - chmod +x gradlew
-
 script:   "./gradlew clean build"
