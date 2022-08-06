@@ -1,9 +1,9 @@
-package com.server.bitwit.module.post.mapper;
+package com.server.bitwit.module.post.dto.mapper;
 
 import com.server.bitwit.infra.config.MapStructConfig;
-import com.server.bitwit.module.post.CommentService;
 import com.server.bitwit.module.post.dto.PostResponse;
 import com.server.bitwit.module.post.dto.PostViewer;
+import com.server.bitwit.module.post.service.CommentService;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

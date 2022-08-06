@@ -12,7 +12,6 @@ import org.springframework.validation.ObjectError;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -31,7 +30,9 @@ public class FieldErrorResponse implements BitwitErrorResponse {
         response.code        = e.getErrorCode( ).getCode( );
         response.message     = e.getMessage( );
         response.httpStatus  = e.getErrorCode( ).getHttpStatus( );
-        response.fieldErrors = fieldErrors.stream( ).map(FieldErrorDto::new).collect(Collectors.toList( ));
+        response.fieldErrors = fieldErrors.stream( )
+                                          .map(FieldErrorDto::new)
+                                          .toList( );
         return response;
     }
     
@@ -40,7 +41,9 @@ public class FieldErrorResponse implements BitwitErrorResponse {
         response.code        = e.getErrorCode( ).getCode( );
         response.message     = e.getMessage( );
         response.httpStatus  = e.getErrorCode( ).getHttpStatus( );
-        response.fieldErrors = objectErrors.stream( ).map(FieldErrorDto::new).collect(Collectors.toList( ));
+        response.fieldErrors = objectErrors.stream( )
+                                           .map(FieldErrorDto::new)
+                                           .toList( );
         return response;
     }
     
@@ -72,8 +75,8 @@ public class FieldErrorResponse implements BitwitErrorResponse {
         public FieldErrorDto(ObjectError objectError) {
             this.code    = objectError.getCode( );
             this.message = objectError.getDefaultMessage( );
-            if (objectError instanceof org.springframework.validation.FieldError) {
-                this.field = ((org.springframework.validation.FieldError)objectError).getField( );
+            if (objectError instanceof FieldError fieldError) {
+                this.field = fieldError.getField( );
             }
             else {
                 this.field = null;

@@ -8,16 +8,14 @@ import org.springframework.http.ResponseEntity;
 public interface BitwitErrorResponse extends BitwitResponse {
     
     static BitwitErrorResponse createErrorResponse(BitwitException e) {
-        if (FieldErrorException.class.isAssignableFrom(e.getClass( ))) {
-            var fe = (FieldErrorException)e;
+        if (e instanceof FieldErrorException fe) {
             return FieldErrorResponse.createErrorResponseWithObjectErrors(fe, fe.getObjectErrors( ));
         }
         return DefaultErrorResponse.createErrorResponse(e);
     }
     
     static ResponseEntity<BitwitErrorResponse> createErrorResponseEntity(BitwitException e) {
-        if (FieldErrorException.class.isAssignableFrom(e.getClass( ))) {
-            var fe = (FieldErrorException)e;
+        if (e instanceof  FieldErrorException fe) {
             return FieldErrorResponse.createErrorResponseEntityWithObjectErrors(fe, fe.getObjectErrors( ));
         }
         return DefaultErrorResponse.createErrorResponseEntity(e);

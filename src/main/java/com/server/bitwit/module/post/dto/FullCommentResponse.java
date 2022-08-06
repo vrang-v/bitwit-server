@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class CommentResponse {
+public class FullCommentResponse {
     
     @JsonProperty("commentId")
     Long id;
@@ -48,12 +48,12 @@ public class CommentResponse {
     
     Long parentId;
     
-    List<CommentResponse> children = new ArrayList<>( );
+    List<FullCommentResponse> children = new ArrayList<>( );
     
     @JsonIgnore
     Set<LikeResponse> likes;
     
-    public CommentResponse setLike(Long accountId) {
+    public FullCommentResponse setLike(Long accountId) {
         like = likes.stream( )
                     .map(LikeResponse::getAccountId)
                     .anyMatch(accountId::equals);
@@ -62,19 +62,18 @@ public class CommentResponse {
     
     
     @Mapper(config = MapStructConfig.class, uses = {AccountResponseMapper.class, CommentLikeResponseMapper.class})
-    public abstract static class CommentResponseMapper implements Converter<Comment, CommentResponse> {
+    public abstract static class CommentResponseMapper implements Converter<Comment, FullCommentResponse> {
         
         @Lazy @Autowired CommentService commentService;
         
         @Override
         @Mapping(target = "postId", source = "post.id")
         @Mapping(target = "parentId", source = "parent.id")
-        @Mapping(target = "children", ignore = true)
         @Mapping(target = "likeCount", expression = "java(comment.getLikes().size())")
-        public abstract CommentResponse convert(Comment comment);
+        public abstract FullCommentResponse convert(Comment comment);
         
         @AfterMapping
-        void afterMapping(Comment comment, @MappingTarget CommentResponse response) {
+        void afterMapping(Comment comment, @MappingTarget FullCommentResponse response) {
             if (comment.isDeleted( )) {
                 response.setWriter(null);
             }

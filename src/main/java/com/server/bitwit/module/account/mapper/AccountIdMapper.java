@@ -17,6 +17,9 @@ public abstract class AccountIdMapper implements Converter<Long, Account> {
     
     @ObjectFactory
     public Account getAccount(Long accountId) {
+        if (accountId == null) {
+            return null;
+        }
         return accountService.findById(accountId)
                              .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
     }
