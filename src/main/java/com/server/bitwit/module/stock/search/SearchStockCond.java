@@ -1,4 +1,4 @@
-package com.server.bitwit.module.stock.dto;
+package com.server.bitwit.module.stock.search;
 
 import lombok.Data;
 

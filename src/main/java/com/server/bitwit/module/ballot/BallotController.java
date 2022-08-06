@@ -25,8 +25,7 @@ public class BallotController {
     @PostMapping
     public ResponseEntity<BallotResponse> createOrChangeBallot(@Jwt Long accountId, @Valid @RequestBody CreateOrChangeBallotRequest request) {
         var response = ballotService.createOrChangeBallot(accountId, request);
-        return response.getStatus( ).equals("CREATED")
-               ? ResponseEntity.status(CREATED).body(response)
-               : ResponseEntity.status(OK).body(response);
+        return ResponseEntity.status(response.getStatus( ).equals("CREATED") ? CREATED : OK)
+                             .body(response);
     }
 }

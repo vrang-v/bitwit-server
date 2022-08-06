@@ -1,14 +1,14 @@
 package com.server.bitwit.module.stock;
 
 import com.server.bitwit.domain.Stock;
+import com.server.bitwit.module.common.service.MappingService;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
 import com.server.bitwit.module.stock.dto.CreateStockRequest;
-import com.server.bitwit.module.stock.dto.SearchStockCond;
 import com.server.bitwit.module.stock.dto.StockResponse;
 import com.server.bitwit.module.stock.dto.UpdateRealTimeInfoRequest;
+import com.server.bitwit.module.stock.search.SearchStockCond;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -25,18 +24,18 @@ public class StockService {
     
     private final StockRepository stockRepository;
     
-    private final ConversionService conversionService;
+    private final MappingService mappingService;
     
     public StockResponse createStock(CreateStockRequest request) {
-        return Optional.ofNullable(conversionService.convert(request, Stock.class))
+        return Optional.ofNullable(mappingService.mapTo(request, Stock.class))
                        .map(stockRepository::save)
-                       .map(stock -> conversionService.convert(stock, StockResponse.class))
+                       .map(stock -> mappingService.mapTo(stock, StockResponse.class))
                        .orElseThrow( );
     }
     
     public StockResponse getStockResponse(Long stockId) {
         return stockRepository.findById(stockId)
-                              .map(stock -> conversionService.convert(stock, StockResponse.class))
+                              .map(stock -> mappingService.mapTo(stock, StockResponse.class))
                               .orElseThrow(( ) -> new NonExistentResourceException("stock", stockId));
     }
     
@@ -44,21 +43,17 @@ public class StockService {
         return stockRepository
                 .searchStockPage(cond, pageable)
                 .stream( )
-                .map(stock -> conversionService.convert(stock, StockResponse.class))
-                .collect(Collectors.toList( ));
+                .map(stock -> mappingService.mapTo(stock, StockResponse.class))
+                .toList( );
     }
     
     public Page<StockResponse> searchStockPage(SearchStockCond cond, Pageable pageable) {
         return stockRepository.searchStockPage(cond, pageable)
-                              .map(stock -> conversionService.convert(stock, StockResponse.class));
+                              .map(stock -> mappingService.mapTo(stock, StockResponse.class));
     }
     
     public Optional<Stock> findById(Long stockId) {
         return stockRepository.findById(stockId);
-    }
-    
-    public List<Stock> findAll( ) {
-        return stockRepository.findAll( );
     }
     
     public boolean existById(Long stockId) {

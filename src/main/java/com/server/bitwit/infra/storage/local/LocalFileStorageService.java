@@ -3,7 +3,6 @@ package com.server.bitwit.infra.storage.local;
 import com.server.bitwit.domain.UploadFile;
 import com.server.bitwit.infra.storage.StorageService;
 import com.server.bitwit.module.error.exception.BitwitException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -15,18 +14,21 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RequiredArgsConstructor
+
 @Profile("local")
 @Service
 public class LocalFileStorageService implements StorageService {
     
-    @Value("${storage.path}")
     private final String storagePath;
+    
+    public LocalFileStorageService(@Value("${storage.path}") String storagePath) {
+        this.storagePath = storagePath;
+    }
     
     @Override
     public UploadFile upload(String fileName, byte[] content) {
         try {
-            var uploadFileName   = generateUploadFileName(fileName);
+            var uploadFileName = generateUploadFileName(fileName);
             Files.write(getAbsolutePath(uploadFileName), content);
             return new UploadFile(fileName, uploadFileName);
         }

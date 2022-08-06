@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 @Mapper(config = MapStructConfig.class)
-public interface UploadFileUrlMapper extends Converter<UploadFile, String> {
+public interface UploadFileToUrlMapper extends Converter<UploadFile, String> {
     
     @Override
     default String convert(UploadFile uploadFile) {

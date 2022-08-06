@@ -21,16 +21,14 @@ public class NonExistentResourceException extends BitwitException {
     }
     
     private static String getErrorMessage(String property, Long id) {
-        var stringBuilder = new StringBuilder( );
-        stringBuilder.append("요청된 id");
-        if (id != null) {
-            stringBuilder.append(" [")
-                         .append(id)
-                         .append("]");
-        }
-        stringBuilder.append("에 해당하는 ")
-                     .append(StringUtils.hasText(property) ? "[" + property + "]" : "리소스")
-                     .append("를 찾을 수 없습니다");
-        return stringBuilder.toString( );
+        return String.format("요청된 %s 해당되는 %s 존재하지 않습니다.", makeIdString(id), makePropertyString(property));
+    }
+    
+    private static String makeIdString(Long id) {
+        return id != null ? String.format("id [%d]에", id) : "조건에";
+    }
+    
+    private static String makePropertyString(String property) {
+        return StringUtils.hasText(property) ? "[" + property + "]가" : "리소스가";
     }
 }

@@ -1,7 +1,7 @@
 package com.server.bitwit.module.stock;
 
 import com.server.bitwit.module.stock.dto.CreateStockRequest;
-import com.server.bitwit.module.stock.dto.SearchStockCond;
+import com.server.bitwit.module.stock.search.SearchStockCond;
 import com.server.bitwit.module.stock.dto.StockResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -15,13 +15,13 @@ import java.util.Date;
 public class JwtProperties {
     
     private String secret;
-    private Long   validityInMillis;
+    private Long   validTimeInMillis;
     
     public SecretKey getSecretKey( ) {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
     
     public Date getExpirationDate( ) {
-        return new Date(System.currentTimeMillis( ) + validityInMillis);
+        return new Date(System.currentTimeMillis( ) + validTimeInMillis);
     }
 }

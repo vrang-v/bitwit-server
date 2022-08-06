@@ -36,7 +36,7 @@ public class VoteRequestValidator implements Validator {
         }
         
         if (errors.hasErrors( )) {
-            throw new FieldErrorException(errors.getAllErrors( ));
+            throw new FieldErrorException(errors);
         }
     }
 }

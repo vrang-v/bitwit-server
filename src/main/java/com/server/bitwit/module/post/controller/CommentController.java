@@ -1,10 +1,8 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.controller;
 
-import com.server.bitwit.module.post.dto.CommentResponse;
-import com.server.bitwit.module.post.dto.CreateCommentRequest;
-import com.server.bitwit.module.post.dto.LikeResponse;
-import com.server.bitwit.module.post.dto.UpdateCommentRequest;
+import com.server.bitwit.module.post.dto.*;
 import com.server.bitwit.module.post.search.CommentSearchCond;
+import com.server.bitwit.module.post.service.CommentService;
 import com.server.bitwit.module.security.jwt.support.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,18 +33,19 @@ public class CommentController {
     }
     
     @GetMapping("/{commentId}")
-    public CommentResponse getComment(@Jwt Long accountId, @PathVariable Long commentId) {
-        return null;
+    public FullCommentResponse getComment(@PathVariable Long commentId) {
+        return commentService.findById(commentId);
     }
     
+    @ResponseStatus(NO_CONTENT)
     @PatchMapping("/{commentId}")
     public void updateComment(@Jwt Long accountId, @PathVariable Long commentId, @Valid @RequestBody UpdateCommentRequest request) {
         commentService.updateComment(request.withCommentId(commentId).withAccountId(accountId));
     }
     
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{commentId}")
     public void deleteComment(@Jwt Long accountId, @PathVariable Long commentId) {
-        
         commentService.deleteComment(commentId, accountId);
     }
     

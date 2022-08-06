@@ -1,9 +1,9 @@
-package com.server.bitwit.module.post.mapper;
+package com.server.bitwit.module.post.dto.mapper;
 
 import com.server.bitwit.domain.Post;
 import com.server.bitwit.infra.config.MapStructConfig;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
-import com.server.bitwit.module.post.PostRepository;
+import com.server.bitwit.module.post.repository.PostRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,9 @@ public abstract class PostIdMapper implements Converter<Long, Post> {
     
     @ObjectFactory
     public Post getPost(Long postId) {
+        if (postId == null) {
+            return null;
+        }
         return postRepository.findById(postId)
                              .orElseThrow(( ) -> new NonExistentResourceException("post", postId));
     }

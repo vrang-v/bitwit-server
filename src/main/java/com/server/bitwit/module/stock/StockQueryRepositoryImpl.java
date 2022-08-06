@@ -1,7 +1,7 @@
 package com.server.bitwit.module.stock;
 
 import com.server.bitwit.domain.Stock;
-import com.server.bitwit.module.stock.dto.SearchStockCond;
+import com.server.bitwit.module.stock.search.SearchStockCond;
 import com.server.bitwit.util.QuerydslRepositoryBase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

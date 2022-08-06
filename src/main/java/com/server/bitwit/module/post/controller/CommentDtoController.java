@@ -1,5 +1,6 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.controller;
 
+import com.server.bitwit.module.post.service.CommentService;
 import com.server.bitwit.module.post.dto.CommentWithPostResponse;
 import com.server.bitwit.module.post.search.CommentSearchCond;
 import lombok.RequiredArgsConstructor;

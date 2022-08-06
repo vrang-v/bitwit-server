@@ -8,13 +8,13 @@ public class BitwitException extends RuntimeException {
     private final ErrorCode errorCode;
     
     public BitwitException( ) {
-        super(ErrorCode.DEFAULT.getBaseMessage( ));
-        this.errorCode = ErrorCode.DEFAULT;
+        super(ErrorCode.SERVER_ERROR.getBaseMessage( ));
+        this.errorCode = ErrorCode.SERVER_ERROR;
     }
     
     public BitwitException(Throwable throwable) {
-        super(ErrorCode.DEFAULT.getBaseMessage( ), throwable);
-        this.errorCode = ErrorCode.DEFAULT;
+        super(ErrorCode.SERVER_ERROR.getBaseMessage( ), throwable);
+        this.errorCode = ErrorCode.SERVER_ERROR;
     }
     
     public BitwitException(ErrorCode errorCode) {
@@ -23,13 +23,13 @@ public class BitwitException extends RuntimeException {
     }
     
     public BitwitException(String detailMessage) {
-        super(ErrorCode.DEFAULT.getBaseMessage( ) + " - " + detailMessage);
-        this.errorCode = ErrorCode.DEFAULT;
+        super(ErrorCode.SERVER_ERROR.getBaseMessage( ) + " - " + detailMessage);
+        this.errorCode = ErrorCode.SERVER_ERROR;
     }
     
     public BitwitException(String detailMessage, Throwable throwable) {
-        super(ErrorCode.DEFAULT.getBaseMessage( ) + " - " + detailMessage, throwable);
-        this.errorCode = ErrorCode.DEFAULT;
+        super(ErrorCode.SERVER_ERROR.getBaseMessage( ) + " - " + detailMessage, throwable);
+        this.errorCode = ErrorCode.SERVER_ERROR;
     }
     
     public BitwitException(ErrorCode errorCode, String detailMessage) {

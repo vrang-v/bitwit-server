@@ -17,4 +17,5 @@ public class BithumbScheduler {
     public void updateRealTimePriceTask( ) {
         bithumbService.updateAllRealTimePrice( );
     }
+    
 }

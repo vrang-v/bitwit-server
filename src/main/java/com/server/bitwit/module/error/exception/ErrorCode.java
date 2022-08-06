@@ -10,7 +10,7 @@ import static org.springframework.http.HttpStatus.*;
 @AllArgsConstructor
 public enum ErrorCode {
     
-    DEFAULT("C1000", "알 수 없는 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
+    SERVER_ERROR("C1000", "알 수 없는 오류가 발생했습니다.", INTERNAL_SERVER_ERROR),
     
     METHOD_NOT_SUPPOERTED("C4005", "지원하지 않는 요청 메소드입니다.", METHOD_NOT_ALLOWED),
     

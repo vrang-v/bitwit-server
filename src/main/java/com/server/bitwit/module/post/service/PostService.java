@@ -1,4 +1,4 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.service;
 
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Post;
@@ -7,9 +7,11 @@ import com.server.bitwit.domain.Tag;
 import com.server.bitwit.module.error.exception.InvalidRequestException;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
 import com.server.bitwit.module.post.dto.*;
+import com.server.bitwit.module.post.repository.PostLikeRepository;
+import com.server.bitwit.module.post.repository.PostRepository;
 import com.server.bitwit.module.post.search.PostSearchCond;
 import com.server.bitwit.module.stock.StockRepository;
-import com.server.bitwit.module.stock.dto.SearchStockCond;
+import com.server.bitwit.module.stock.search.SearchStockCond;
 import com.server.bitwit.module.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
@@ -22,7 +24,6 @@ import org.springframework.util.StringUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -53,7 +54,7 @@ public class PostService {
                                  if (StringUtils.hasText(request.getContent( ))) {
                                      post.updateContent(request.getContent( ));
                                  }
-                                 if (! CollectionUtils.isEmpty(request.getTickers( ))) {
+                                 if (! CollectionUtils.isEmpty(request.getTags( ))) {
                                      post.clearTag( );
                                      request.getTags( )
                                             .stream( )
@@ -62,6 +63,8 @@ public class PostService {
                                                                  .orElseGet(( ) -> tagRepository.save(new Tag(name)))
                                             )
                                             .forEach(post::addTag);
+                                 }
+                                 if (! CollectionUtils.isEmpty(request.getTickers( ))) {
                                      var cond = new SearchStockCond( );
                                      cond.setTickers(request.getTickers( ));
                                      var stocks = stockRepository.searchStocks(cond);
@@ -78,7 +81,7 @@ public class PostService {
                              .stream( )
                              .map(post -> new PostViewer(accountId, post))
                              .map(postViewer -> conversionService.convert(postViewer, PostResponse.class))
-                             .collect(Collectors.toList( ));
+                             .toList( );
     }
     
     public PostResponse getPost(Long postId, Long accountId) {

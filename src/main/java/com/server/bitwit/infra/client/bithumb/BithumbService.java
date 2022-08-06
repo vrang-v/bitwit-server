@@ -32,7 +32,7 @@ public class BithumbService {
                      }
                      catch (InterruptedException e) {
                          Thread.currentThread( ).interrupt( );
-                         throw new BitwitException(e.getMessage( ));
+                         throw new BitwitException(e);
                      }
                  });
     }
@@ -50,6 +50,6 @@ public class BithumbService {
                      var fluctuateRate = response.getData( ).getFluctuateRate24h( );
                      return new UpdateRealTimeInfoRequest(ticker, currentPrice, fluctuate, fluctuateRate);
                  })
-                 .subscribe(stockService::updateRealTimeInfo, e -> { throw new BitwitException(e.getMessage( )); });
+                 .subscribe(stockService::updateRealTimeInfo, e -> { throw new BitwitException(e); });
     }
 }

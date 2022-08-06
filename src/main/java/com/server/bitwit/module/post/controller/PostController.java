@@ -1,5 +1,7 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.controller;
 
+import com.server.bitwit.module.post.service.CommentService;
+import com.server.bitwit.module.post.service.PostService;
 import com.server.bitwit.module.post.dto.*;
 import com.server.bitwit.module.post.search.PostSearchCond;
 import com.server.bitwit.module.security.jwt.support.Jwt;

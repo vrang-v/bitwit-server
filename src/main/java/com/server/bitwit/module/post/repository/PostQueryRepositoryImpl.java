@@ -1,7 +1,6 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.repository;
 
 import com.server.bitwit.domain.Post;
-import com.server.bitwit.domain.QTag;
 import com.server.bitwit.module.post.search.PostSearchCond;
 import com.server.bitwit.util.QuerydslRepositoryBase;
 import org.springframework.data.domain.Page;

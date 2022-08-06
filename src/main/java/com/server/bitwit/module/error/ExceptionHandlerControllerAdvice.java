@@ -8,20 +8,27 @@ import com.server.bitwit.module.error.response.BitwitErrorResponse;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.server.bitwit.module.error.exception.ErrorCode.DEFAULT;
+import static com.server.bitwit.module.error.exception.ErrorCode.SERVER_ERROR;
 import static com.server.bitwit.module.error.response.BitwitErrorResponse.createErrorResponseEntity;
 
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandlerControllerAdvice {
+    
+    @ExceptionHandler
+    public ResponseEntity<BitwitErrorResponse> handleBitwitException(BitwitException e) {
+        log.error("handleBitwitException", e);
+        return createErrorResponseEntity(e);
+    }
     
     @ExceptionHandler
     public ResponseEntity<BitwitErrorResponse> handleNotFoundException(NotFoundException e) {
@@ -54,21 +61,22 @@ public class ExceptionHandlerControllerAdvice {
     }
     
     @ExceptionHandler
-    public ResponseEntity<BitwitErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("handleMethodArgumentNotValidException", e);
-        return createErrorResponseEntity(new FieldErrorException(e.getAllErrors( )));
+    public ResponseEntity<BitwitErrorResponse> handleBindException(BindException e) {
+        log.error("handleBindException", e);
+        return createErrorResponseEntity(new FieldErrorException(e));
     }
     
     @ExceptionHandler
-    public ResponseEntity<BitwitErrorResponse> handleBitwitException(BitwitException e) {
-        log.error("handleBitwitException", e);
-        return createErrorResponseEntity(new BitwitException(e.getErrorCode( ) == null ? DEFAULT : e.getErrorCode( )));
+    public ResponseEntity<BitwitErrorResponse> handleConversionFailedException(ConversionFailedException e) {
+        log.error("handleConversionFailedException", e);
+        var cause = e.getCause( );
+        return createErrorResponseEntity(cause instanceof BitwitException be ? be : new BitwitException(e));
     }
     
     @Order
     @ExceptionHandler
     public ResponseEntity<BitwitErrorResponse> handleException(Exception e) {
         log.error("handleException", e);
-        return createErrorResponseEntity(new BitwitException(DEFAULT));
+        return createErrorResponseEntity(new BitwitException(SERVER_ERROR));
     }
 }

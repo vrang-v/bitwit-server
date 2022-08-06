@@ -1,12 +1,12 @@
 package com.server.bitwit.module.security.jwt;
 
-import com.google.common.net.HttpHeaders;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.security.AccountPrincipal;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +30,8 @@ public class JwtService {
     private final JwtProperties jwtProperties;
     
     public String generateJwt(Authentication authentication) {
-        var authorities = authentication.getAuthorities( ).stream( )
+        var authorities = authentication.getAuthorities( )
+                                        .stream( )
                                         .map(GrantedAuthority::getAuthority)
                                         .collect(Collectors.joining(","));
         var claims = Map.of(
@@ -61,11 +62,10 @@ public class JwtService {
                        .get(claim.getKey( ), claim.getType( ));
         }
         catch (MalformedJwtException e) {
-            throw new BitwitException(ErrorCode.INVALID_JWT);
+            throw new BitwitException(ErrorCode.INVALID_JWT, e);
         }
         catch (Exception e) {
-            e.printStackTrace( );
-            throw new BitwitException(ErrorCode.AUTHENTICATION_FAILED);
+            throw new BitwitException(ErrorCode.AUTHENTICATION_FAILED, e);
         }
     }
     
@@ -76,10 +76,10 @@ public class JwtService {
                 .build( )
                 .parseClaimsJws(jwt)
                 .getBody( );
-        
+    
         var authorities = stream(claims.get(Claim.AUTHORITIES.getKey( )).toString( ).split(","))
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList( ));
+                .toList( );
         
         var user = new User(claims.getSubject( ), jwt, authorities);
         return new UsernamePasswordAuthenticationToken(user, jwt, authorities);
