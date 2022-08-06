@@ -12,15 +12,13 @@ import com.server.bitwit.module.common.service.EmailService;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
-import com.server.bitwit.module.file.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.time.Duration;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
@@ -42,7 +40,7 @@ public class AccountService {
                        .map(emailService::sendSignUpConfirmEmail)
                        .map(accountRepository::save)
                        .map(account -> conversionService.convert(account, AccountResponse.class))
-                       .orElse(null);
+                       .orElseThrow(BitwitException::new);
     }
     
     public AccountResponse getAccountResponse(Long accountId) {
@@ -71,17 +69,12 @@ public class AccountService {
     }
     
     @Transactional
-    public AccountResponse changeProfileImage(Long accountId, MultipartFile profileImage) {
-        try {
-            var uploadFile = storageService.upload(profileImage.getOriginalFilename( ), profileImage.getBytes( ));
-            return accountRepository.findById(accountId)
-                                    .map(account -> account.changeProfileImage(uploadFile))
-                                    .map(account -> conversionService.convert(account, AccountResponse.class))
-                                    .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
-        }
-        catch (IOException e) {
-            throw new BitwitException(e);
-        }
+    public AccountResponse changeProfileImage(Long accountId, String imageName, byte[] imageContent) {
+        var uploadFile = storageService.upload(imageName, imageContent);
+        return accountRepository.findById(accountId)
+                                .map(account -> account.changeProfileImage(uploadFile))
+                                .map(account -> conversionService.convert(account, AccountResponse.class))
+                                .orElseThrow(( ) -> new NonExistentResourceException("account", accountId));
     }
     
     @Transactional
@@ -103,9 +96,9 @@ public class AccountService {
         accountRepository.findById(accountId)
                          .filter(account -> account.getAccountType( ) == AccountType.EMAIL)
                          .ifPresent(account -> {
-                             var lastEmailSentAt                = account.getLastEmailTokenGeneratedAt( );
-                             var lastEmailSentLessThanOneMinute = lastEmailSentAt.plusMinutes(1L).isAfter(now( ));
-                             if (lastEmailSentLessThanOneMinute) {
+                             var lastEmailSentAt = account.getLastEmailTokenGeneratedAt( );
+                             var timeInterval    = Duration.between(lastEmailSentAt, now( ));
+                             if (timeInterval.compareTo(Duration.ofMinutes(1)) < 0) {
                                  throw new BitwitException(ErrorCode.REQUEST_LIMIT);
                              }
                              emailService.sendSignUpConfirmEmail(account);

@@ -39,10 +39,10 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     Post post;
     
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
     Comment parent;
     
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, cascade = CascadeType.ALL)
     List<Comment> children = new ArrayList<>( );
     
     @BatchSize(size = 500)

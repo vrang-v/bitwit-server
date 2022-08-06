@@ -1,20 +1,19 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.service;
 
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Comment;
 import com.server.bitwit.domain.CommentLike;
-import com.server.bitwit.domain.Post;
+import com.server.bitwit.module.common.service.MappingService;
 import com.server.bitwit.module.error.exception.BitwitException;
 import com.server.bitwit.module.error.exception.ErrorCode;
+import com.server.bitwit.module.error.exception.InvalidRequestException;
 import com.server.bitwit.module.error.exception.NonExistentResourceException;
-import com.server.bitwit.module.post.dto.CommentResponse;
-import com.server.bitwit.module.post.dto.CreateCommentRequest;
-import com.server.bitwit.module.post.dto.LikeResponse;
-import com.server.bitwit.module.post.dto.UpdateCommentRequest;
+import com.server.bitwit.module.post.dto.*;
+import com.server.bitwit.module.post.repository.CommentLikeRepository;
+import com.server.bitwit.module.post.repository.CommentRepository;
 import com.server.bitwit.module.post.search.CommentSearchCond;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,30 +32,29 @@ public class CommentService {
     private final CommentRepository     commentRepository;
     private final CommentLikeRepository likeRepository;
     
-    private final ConversionService conversionService;
+    private final MappingService mappingService;
     
+    @Transactional
     public CommentResponse createComment(CreateCommentRequest request) {
-        Comment parent = null;
-        if (request.getParentId( ) != null) {
-            if (! commentRepository.existParent(request.getPostId( ), request.getParentId( ))) {
-                throw new BitwitException(ErrorCode.INVALID_REQUEST);
-            }
-            parent = conversionService.convert(request.getParentId( ), Comment.class);
-        }
-        var account = conversionService.convert(request.getAccountId( ), Account.class);
-        var post    = conversionService.convert(request.getPostId( ), Post.class);
-        var comment = commentRepository.save(new Comment(request.getContent( ), account, post, parent));
-        return conversionService.convert(comment, CommentResponse.class);
+        return Optional.ofNullable(mappingService.mapTo(request, Comment.class))
+                       .map(commentRepository::save)
+                       .map(comment -> mappingService.mapTo(comment, CommentResponse.class))
+                       .orElseThrow(( ) -> new InvalidRequestException("댓글을 생성할 수 없습니다."));
     }
     
     public Page<CommentResponse> searchComment(CommentSearchCond cond, Pageable pageable) {
         return commentRepository.searchComments(cond, pageable)
-                                .map(comment -> conversionService.convert(comment, CommentResponse.class));
+                                .map(comment -> mappingService.mapTo(comment, CommentResponse.class));
     }
     
     public <T> Page<T> searchComment(CommentSearchCond cond, Pageable pageable, Class<T> responseType) {
         return commentRepository.searchComments(cond, pageable)
-                                .map(comment -> conversionService.convert(comment, responseType));
+                                .map(comment -> mappingService.mapTo(comment, responseType));
+    }
+    
+    public FullCommentResponse findById(Long id) {
+        var comment = commentRepository.findById(id).orElseThrow(BitwitException::new);
+        return mappingService.mapTo(comment, FullCommentResponse.class);
     }
     
     public List<CommentResponse> findAllByPostId(Long postId, Long accountId) {
@@ -66,7 +65,7 @@ public class CommentService {
     @Transactional
     public void updateComment(UpdateCommentRequest request) {
         var accountId = request.getAccountId( );
-        var comment   = conversionService.convert(request.getCommentId( ), Comment.class);
+        var comment   = mappingService.mapTo(request.getCommentId( ), Comment.class);
         if (! comment.getWriter( ).getId( ).equals(accountId)) {
             throw new BitwitException(ErrorCode.NO_PERMISSION);
         }
@@ -75,10 +74,14 @@ public class CommentService {
     
     @Transactional
     public void deleteComment(Long commentId, Long accountId) {
-        var comment = commentRepository.findById(commentId)
-                                       .orElseThrow(( ) -> new NonExistentResourceException("comment", commentId));
+        var comment = mappingService.mapTo(commentId, Comment.class);
+        
         if (! comment.getWriter( ).getId( ).equals(accountId)) {
             throw new BitwitException(ErrorCode.NO_PERMISSION);
+        }
+        
+        if (comment.isDeleted( )) {
+            throw new InvalidRequestException("이미 삭제된 댓글입니다.");
         }
         
         if (comment.getChildren( ).isEmpty( )) {
@@ -94,7 +97,7 @@ public class CommentService {
         var responses = new ArrayList<CommentResponse>( );
         var memory    = new HashMap<Long, CommentResponse>( );
         comments.forEach(comment -> {
-            var response = conversionService.convert(comment, CommentResponse.class);
+            var response = mappingService.mapTo(comment, CommentResponse.class);
             response.setLike(accountId);
             memory.put(response.getId( ), response);
             if (comment.isRoot( )) {
@@ -110,20 +113,21 @@ public class CommentService {
     public LikeResponse like(Long commentId, Long accountId) {
         var like = likeRepository.findByCommentIdAndAccountId(commentId, accountId);
         if (like.isPresent( )) {
-            return conversionService.convert(like.get( ), LikeResponse.class)
-                                    .setLike( );
+            return mappingService.mapTo(like.get( ), LikeResponse.class)
+                                 .setLike( );
         }
-        var comment = conversionService.convert(commentId, Comment.class);
-        var account = conversionService.convert(accountId, Account.class);
+        var comment = mappingService.mapTo(commentId, Comment.class);
+        var account = mappingService.mapTo(accountId, Account.class);
         var newLike = likeRepository.save(new CommentLike(comment, account));
-        return conversionService.convert(newLike, LikeResponse.class)
-                                .setLike( );
+        return mappingService.mapTo(newLike, LikeResponse.class)
+                             .setLike( );
     }
     
     public LikeResponse dislike(Long commentId, Long accountId) {
-        var like = likeRepository.findByCommentIdAndAccountId(commentId, accountId);
-        like.ifPresent(likeRepository::delete);
-        return conversionService.convert(like.get( ), LikeResponse.class)
-                                .setDislike( );
+        var like = likeRepository.findByCommentIdAndAccountId(commentId, accountId)
+                                 .orElseThrow(( ) -> new NonExistentResourceException("like"));
+        likeRepository.delete(like);
+        return mappingService.mapTo(like, LikeResponse.class)
+                             .setDislike( );
     }
 }

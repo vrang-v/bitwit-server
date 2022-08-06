@@ -1,19 +1,16 @@
 package com.server.bitwit.module.account;
 
-import com.server.bitwit.module.account.dto.AccountResponse;
-import com.server.bitwit.module.account.dto.CreateEmailAccountRequest;
-import com.server.bitwit.module.account.dto.DuplicateCheckResponse;
-import com.server.bitwit.module.account.dto.UpdateAccountRequest;
+import com.server.bitwit.module.account.dto.*;
+import com.server.bitwit.module.error.exception.InvalidRequestException;
 import com.server.bitwit.module.security.jwt.support.Jwt;
+import com.server.bitwit.util.FormatUtils;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.core.io.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
+import java.io.IOException;
 
 import static com.server.bitwit.domain.AccountType.EMAIL;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -32,8 +29,14 @@ public class AccountController {
     }
     
     @PostMapping("/profile-image")
-    public AccountResponse setProfileImage(@Jwt Long accountId, @RequestParam("file") MultipartFile file) {
-        return accountService.changeProfileImage(accountId, file);
+    public AccountResponse setProfileImage(@Jwt Long accountId, @RequestParam("profileImage") MultipartFile profileImage)
+    throws IOException {
+        if (profileImage.isEmpty( )) {
+            throw new InvalidRequestException("프로필 이미지가 비어있습니다.");
+        }
+        var imageName    = profileImage.getOriginalFilename( );
+        var imageContent = profileImage.getBytes( );
+        return accountService.changeProfileImage(accountId, imageName, imageContent);
     }
     
     @GetMapping("/me")
@@ -52,20 +55,26 @@ public class AccountController {
     }
     
     @GetMapping("/duplicate-check/email")
-    public DuplicateCheckResponse checkForDuplicateEmail(@Email @Validated @RequestParam String email) {
-        return DuplicateCheckResponse.email(email, accountService.existsByEmailAndAccountType(email, EMAIL));
+    public DuplicateCheckResponse checkForDuplicateEmail(@RequestParam String email) {
+        if (! FormatUtils.isEmailFormat(email)) {
+            throw new InvalidRequestException("올바른 이메일 형식이 아닙니다.");
+        }
+        var result = accountService.existsByEmailAndAccountType(email, EMAIL);
+        return DuplicateCheckResponse.email(email, result);
     }
     
     @GetMapping("/duplicate-check/name")
     public DuplicateCheckResponse checkForDuplicateName(@RequestParam String name) {
-        return DuplicateCheckResponse.name(name, accountService.existsByName(name));
+        var result = accountService.existsByName(name);
+        return DuplicateCheckResponse.name(name, result);
     }
     
     @GetMapping("/email-verified-check")
-    public JSONObject checkEmailVerified(@RequestParam Long accountId) {
-        return new JSONObject( )
-                .put("accountId", accountId)
-                .put("verified", accountService.isEmailVerified(accountId));
+    public EmailVerifiedCheckResponse checkEmailVerified(@RequestParam Long accountId) {
+        return EmailVerifiedCheckResponse.builder( )
+                                         .accountId(accountId)
+                                         .verified(accountService.isEmailVerified(accountId))
+                                         .build( );
     }
     
     @GetMapping("/resend-email-token")
