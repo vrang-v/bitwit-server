@@ -17,15 +17,14 @@ import com.server.bitwit.util.WithMockAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.server.bitwit.domain.VotingOption.DECREMENT;
 import static java.time.LocalDateTime.now;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,16 +56,15 @@ class BallotControllerTest {
         
         // then
         mockMvc.perform(post("/api/ballots")
-                       .accept(MediaType.APPLICATION_JSON_UTF8)
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
+                       .contentType(APPLICATION_JSON)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
+                       .content(objectMapper.writeValueAsString(ballotRequest))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isCreated( ),
                        jsonPath("ballotId").exists( ),
                        jsonPath("status").value("CREATED")
-               ));
+               );
     }
     
     @Test
@@ -82,15 +80,14 @@ class BallotControllerTest {
         
         // then
         mockMvc.perform(post("/api/ballots")
-                       .accept(MediaType.APPLICATION_JSON_UTF8)
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
+                       .contentType(APPLICATION_JSON)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
+                       .content(objectMapper.writeValueAsString(ballotRequest))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isNotFound( ),
                        jsonPath("code").value(ErrorCode.RESOURCE_NOT_FOUND.getCode( ))
-               ));
+               );
     }
     
     @Test
@@ -102,15 +99,14 @@ class BallotControllerTest {
         
         // then
         mockMvc.perform(post("/api/ballots")
-                       .accept(MediaType.APPLICATION_JSON_UTF8)
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
+                       .contentType(APPLICATION_JSON)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
+                       .content(objectMapper.writeValueAsString(ballotRequest))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isNotFound( ),
                        jsonPath("code").value(ErrorCode.RESOURCE_NOT_FOUND.getCode( ))
-               ));
+               );
     }
     
     @Test
@@ -128,18 +124,17 @@ class BallotControllerTest {
         
         // then
         mockMvc.perform(post("/api/ballots")
-                       .accept(MediaType.APPLICATION_JSON_UTF8)
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
+                       .contentType(APPLICATION_JSON)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
+                       .content(objectMapper.writeValueAsString(ballotRequest))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isOk( ),
                        jsonPath("ballotId").exists( ),
                        jsonPath("voteId").value(voteId),
                        jsonPath("votingOption").value("DECREMENT"),
                        jsonPath("status").value("UPDATED")
-               ));
+               );
     }
     
     @Test
@@ -156,17 +151,16 @@ class BallotControllerTest {
         
         // when, then
         mockMvc.perform(post("/api/ballots")
-                       .accept(MediaType.APPLICATION_JSON_UTF8)
-                       .content(objectMapper.writeValueAsString(ballotRequest))
-                       .contentType(MediaType.APPLICATION_JSON)
+                       .contentType(APPLICATION_JSON)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
+                       .content(objectMapper.writeValueAsString(ballotRequest))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isOk( ),
                        jsonPath("ballotId").exists( ),
                        jsonPath("voteId").value(voteId),
                        jsonPath("status").value("DELETED")
-               ));
+               );
     }
     
     private Long getMockAccountId( ) {

@@ -11,12 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -39,10 +37,8 @@ class VoteControllerTest {
     void votePageTest( ) throws Exception {
         mockMvc.perform(get("/api/votes/search/page/type/vote-item")
                        .header("Authorization", mockJwt.getBearerToken( ))
-                       .header("Accept", MediaType.APPLICATION_JSON_UTF8)
                        .param("size", "10")
                )
-               .andDo(print( ))
                .andExpect(status( ).isOk( ));
     }
 

@@ -1,4 +1,4 @@
-package com.server.bitwit.module.post;
+package com.server.bitwit.module.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.bitwit.module.post.dto.CreatePostRequest;
@@ -14,8 +14,6 @@ import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,23 +32,21 @@ class PostControllerTest {
     void createPost( ) throws Exception {
         // given
         var request = new CreatePostRequest( );
-        request.setTitle("시황 정리");
-        request.setContent("나스닥 폭락");
-        request.setTickers(List.of("BTC"));
+        request.setTitle("제목입니다");
+        request.setContent("내용입니다");
         
         // then
         mockMvc.perform(post("/api/posts")
-                       .accept(APPLICATION_JSON_UTF8)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isCreated( ),
                        jsonPath("$.postId").exists( ),
-                       jsonPath("$.title").value("시황 정리"),
-                       jsonPath("$.content").value("나스닥 폭락")
-               ));
+                       jsonPath("$.title").value("제목입니다"),
+                       jsonPath("$.content").value("내용입니다")
+               );
     }
     
     @Test
@@ -58,32 +54,34 @@ class PostControllerTest {
     void createPost_withStock( ) throws Exception {
         // given
         var request = new CreatePostRequest( );
-        request.setTitle("시황 정리");
-        request.setContent("나스닥 폭락");
+        request.setTitle("제목입니다");
+        request.setContent("내용입니다");
         request.setTickers(List.of("BTC"));
         
         // then
         mockMvc.perform(post("/api/posts")
-                       .accept(APPLICATION_JSON_UTF8)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andExpect(matchAll(
-                       status( ).isCreated( )
-               ));
+               .andExpectAll(
+                       status( ).isCreated( ),
+                       jsonPath("$.postId").exists( ),
+                       jsonPath("$.title").value("제목입니다"),
+                       jsonPath("$.content").value("내용입니다"),
+                       jsonPath("$.stocks[0].ticker").value("BTC")
+               );
     }
     
     @Test
     @WithMockAccount
     void search( ) throws Exception {
         mockMvc.perform(get("/api/posts/search")
-                       .accept(APPLICATION_JSON_UTF8)
                        .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                        .param("ticker", "BTC")
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isOk( )
-               ));
+               );
     }
 }

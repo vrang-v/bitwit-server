@@ -5,20 +5,17 @@ import com.server.bitwit.module.account.AccountRepository;
 import com.server.bitwit.module.auth.dto.LoginRequest;
 import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.security.jwt.JwtService;
+import com.server.bitwit.util.MockJwt;
 import com.server.bitwit.util.MockMvcTest;
 import com.server.bitwit.util.WithMockAccount;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.ResultMatcher.matchAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,9 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
     
     @Autowired MockMvc      mockMvc;
+    @Autowired MockJwt      mockJwt;
     @Autowired ObjectMapper objectMapper;
     
-    @Autowired JwtService jwtService;
+    @Autowired JwtService        jwtService;
     @Autowired AccountRepository accountRepository;
     
     @Test
@@ -40,17 +38,16 @@ class AuthControllerTest {
         
         // then
         mockMvc.perform(post("/api/login")
-                       .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isOk( ),
                        jsonPath("jwt").exists( ),
                        jsonPath("accountId").exists( ),
                        jsonPath("email").exists( ),
                        jsonPath("password").doesNotExist( )
-               ));
+               );
     }
     
     @Test
@@ -60,14 +57,13 @@ class AuthControllerTest {
         
         // then
         mockMvc.perform(post("/api/login")
-                       .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isUnauthorized( ),
                        jsonPath("code").value(ErrorCode.AUTHENTICATION_FAILED.getCode( ))
-               ));
+               );
     }
     
     @Test
@@ -78,66 +74,51 @@ class AuthControllerTest {
         
         // then
         mockMvc.perform(post("/api/login")
-                       .accept(APPLICATION_JSON_UTF8)
                        .contentType(APPLICATION_JSON)
                        .content(objectMapper.writeValueAsString(request))
                )
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isUnauthorized( ),
                        jsonPath("code").value(ErrorCode.AUTHENTICATION_FAILED.getCode( ))
-               ));
+               );
     }
     
     @Test
     @WithMockAccount
     void jwtLogin( ) throws Exception {
-        // given
-        var jwt = "Bearer " + jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( ));
-        
-        // then
         mockMvc.perform(post("/api/login/jwt")
-                       .header(AUTHORIZATION, jwt)
+                       .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                )
-               .andDo(print( ))
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isOk( )
-               ));
+               );
     }
     
     @Test
     @WithMockAccount
     void jwtLogin_deletedUserJwt( ) throws Exception {
-        // given
-        var jwt = "Bearer " + jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( ));
+        // when
         accountRepository.deleteByEmail(WithMockAccount.DEFAULT_EMAIL);
         
         // then
         mockMvc.perform(post("/api/login/jwt")
-                       .accept(APPLICATION_JSON_UTF8)
-                       .header(AUTHORIZATION, jwt)
+                       .header(AUTHORIZATION, mockJwt.getBearerToken( ))
                )
-               .andDo(print( ))
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isUnauthorized( ),
                        jsonPath("code").value(ErrorCode.AUTHENTICATION_FAILED.getCode( ))
-               ));
+               );
     }
     
     @Test
     @WithMockAccount
     void jwtLogin_invalidJwt_401( ) throws Exception {
-        // given
-        var jwt = "Bearer "+ jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( )) + "wrong";
-        
-        // then
         mockMvc.perform(post("/api/login/jwt")
-                       .accept(APPLICATION_JSON_UTF8)
-                       .header(AUTHORIZATION, jwt)
+                       .header(AUTHORIZATION, mockJwt.getBearerToken( ) + "wrong")
                )
-               .andDo(print( ))
-               .andExpect(matchAll(
+               .andExpectAll(
                        status( ).isUnauthorized( ),
                        jsonPath("code").value(ErrorCode.AUTHENTICATION_FAILED.getCode( ))
-               ));
+               );
     }
 }

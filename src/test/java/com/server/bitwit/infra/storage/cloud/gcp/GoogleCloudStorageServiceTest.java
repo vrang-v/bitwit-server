@@ -21,15 +21,21 @@ class GoogleCloudStorageServiceTest {
     
     @Test
     void transaction( ) throws IOException {
-        var text           = "Hello Storage Service!";
-        var uploadFile     = storageService.upload("test.txt", text.getBytes(Charset.defaultCharset( )));
+        // given
+        var fileName = "test.txt";
+        var content  = "Hello Storage Service!";
+        
+        // when
+        var uploadFile     = storageService.upload(fileName, content.getBytes(Charset.defaultCharset( )));
         var uploadFileName = uploadFile.getUploadFileName( );
         var downloadFile   = storageService.download(uploadFileName);
-        var downloadText = new BufferedReader(new InputStreamReader(downloadFile.getInputStream( )))
+        var downloadContent = new BufferedReader(new InputStreamReader(downloadFile.getInputStream( )))
                 .lines( )
                 .collect(Collectors.joining( ));
         
-        assertThat(text).isEqualTo(downloadText);
+        //then
+        assertThat(content).isEqualTo(downloadContent);
+        
         storageService.delete(uploadFileName);
     }
 }

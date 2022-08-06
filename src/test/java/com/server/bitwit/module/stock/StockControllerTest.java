@@ -1,23 +1,19 @@
 package com.server.bitwit.module.stock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.server.bitwit.module.error.exception.ErrorCode;
 import com.server.bitwit.module.stock.dto.CreateStockRequest;
 import com.server.bitwit.module.stock.dto.StockResponse;
 import com.server.bitwit.util.MockMvcTest;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,11 +39,10 @@ class StockControllerTest {
         request.setTicker(STOCK_TICKER);
         request.setKoreanName(STOCK_KOREAN_NAME);
         
-        // when, then
+        // then
         mockMvc.perform(post("/api/stocks")
-                       .content(objectMapper.writeValueAsString(request))
                        .contentType(APPLICATION_JSON)
-                       .accept(APPLICATION_JSON_UTF8)
+                       .content(objectMapper.writeValueAsString(request))
                )
                .andExpect(status( ).isCreated( ));
     }
@@ -55,9 +50,7 @@ class StockControllerTest {
     @Test
     @DisplayName("Stock 생성 / 요청 값 없음 / 400")
     void createStock_noRequestContent_400( ) throws Exception {
-        // when, then
-        mockMvc.perform(post("/api/stocks")
-                       .accept(APPLICATION_JSON_UTF8))
+        mockMvc.perform(post("/api/stocks"))
                .andExpect(status( ).isBadRequest( ));
     }
     
@@ -68,10 +61,10 @@ class StockControllerTest {
         var request = new CreateStockRequest( );
         request.setFullName(null);
         
-        // when, then
+        // then
         mockMvc.perform(post("/api/stocks")
-                       .content(objectMapper.writeValueAsString(request))
                        .contentType(APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(request))
                )
                .andExpect(status( ).isBadRequest( ));
     }
@@ -80,28 +73,33 @@ class StockControllerTest {
     @DisplayName("Stock 조회 / 정상 / 200")
     void getStock( ) throws Exception {
         // given
-        var stockId = createMockStock(STOCK_NAME).getId( );
+        var stockId = createMockStock( ).getId( );
         
-        // when, then
-        mockMvc.perform(get("/api/stocks/" + stockId)
-                       .accept(APPLICATION_JSON_UTF8)
+        // then
+        mockMvc.perform(get("/api/stocks/{stockId}", stockId)
                )
-               .andExpect(status( ).isOk( ))
-               .andExpect(jsonPath("$.stockId").value(stockId))
-               .andExpect(jsonPath("$.fullName").value(STOCK_NAME));
+               .andExpectAll(
+                       status( ).isOk( ),
+                       jsonPath("$.stockId").value(stockId),
+                       jsonPath("$.fullName").value(STOCK_NAME)
+               );
     }
     
     @Test
     @DisplayName("Stock 조회 / 존재하지 않는 id / 404")
-    void getStock_nonExistentId_400( ) throws Exception {
+    void getStock_nonExistentId_404( ) throws Exception {
         var nonExistentId = - 1;
-        mockMvc.perform(get("/api/stocks/" + nonExistentId))
-               .andExpect(status( ).isNotFound( ));
+        mockMvc.perform(get("/api/stocks/{stockId}", nonExistentId)
+               )
+               .andExpectAll(
+                       status( ).isNotFound( ),
+                       jsonPath("$.code").value(ErrorCode.RESOURCE_NOT_FOUND.getCode( ))
+               );
     }
     
-    private StockResponse createMockStock(String name) {
+    private StockResponse createMockStock( ) {
         var request = new CreateStockRequest( );
-        request.setFullName(name);
+        request.setFullName(StockControllerTest.STOCK_NAME);
         
         return stockService.createStock(request);
     }

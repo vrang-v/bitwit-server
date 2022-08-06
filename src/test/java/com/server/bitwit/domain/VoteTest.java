@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class VoteTest {
+    
     @Test
     @DisplayName("Vote 생성 / 정상")
     void createVote_normal( ) {
@@ -40,7 +41,7 @@ class VoteTest {
         var startTime   = LocalDateTime.of(2022, 1, 1, 0, 0);
         var endTime     = LocalDateTime.of(2021, 1, 1, 0, 0);
         
-        // when, then
+        // then
         assertThrows(BitwitException.class, ( ) -> Vote.createVote(stock, description, startTime, endTime));
     }
     
@@ -130,12 +131,6 @@ class VoteTest {
                 entry(VotingOption.INCREMENT, 1),
                 entry(VotingOption.DECREMENT, 2)
         );
-    }
-    
-    @Test
-    @DisplayName("Ballot 수정 / 수량 0인 항목을 변경")
-    void changeBallot_changeCount0Option( ) {
-        // TODO: 투표 유효 기간에 참여한 항목을 투표 기간이 종료되고 항목을 변경하는 테스트
     }
     
     @Test

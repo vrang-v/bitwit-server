@@ -16,6 +16,6 @@ public class MockJwt {
     }
     
     public String getBearerToken( ) {
-        return "Bearer " + jwtService.generateJwt(SecurityContextHolder.getContext( ).getAuthentication( ));
+        return "Bearer " + getJwt( );
     }
 }
