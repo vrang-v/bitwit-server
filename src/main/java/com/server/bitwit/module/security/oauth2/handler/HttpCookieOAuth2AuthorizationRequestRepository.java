@@ -29,8 +29,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
         if (authorizationRequest == null) {
-            CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST);
-            CookieUtils.deleteCookie(request, response, REDIRECT_URI);
+            removeAuthorizationRequestCookies(request, response);
             return;
         }
     

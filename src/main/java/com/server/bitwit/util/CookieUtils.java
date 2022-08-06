@@ -2,6 +2,7 @@ package com.server.bitwit.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.SerializationUtils;
 
 import javax.servlet.http.Cookie;
@@ -17,13 +18,10 @@ public class CookieUtils {
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         var cookies = request.getCookies( );
         
-        if (! hasCookie(cookies)) {
+        if (isEmpty(cookies)) {
             return Optional.empty( );
         }
-        
-        return Arrays.stream(cookies)
-                     .filter(cookie -> cookie.getName( ).equals(name))
-                     .findFirst( );
+        return findCookie(name, cookies);
     }
     
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
@@ -36,16 +34,15 @@ public class CookieUtils {
     
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         var cookies = request.getCookies( );
-        if (hasCookie(cookies)) {
-            for (var cookie : cookies) {
-                if (cookie.getName( ).equals(name)) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                }
-            }
+        if (isEmpty(cookies)) {
+            return;
         }
+        findCookie(name, cookies).ifPresent(cookie -> {
+            cookie.setValue("");
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        });
     }
     
     public static String serialize(Object object) {
@@ -57,7 +54,13 @@ public class CookieUtils {
         return clazz.cast(SerializationUtils.deserialize(Base64.getUrlDecoder( ).decode(cookie.getValue( ))));
     }
     
-    private static boolean hasCookie(Cookie[] cookies) {
-        return cookies != null && cookies.length > 0;
+    private static Optional<Cookie> findCookie(String name, Cookie[] cookies) {
+        return Arrays.stream(cookies)
+                     .filter(cookie -> cookie.getName( ).equals(name))
+                     .findFirst( );
+    }
+    
+    private static boolean isEmpty(Cookie[] cookies) {
+        return ObjectUtils.isEmpty(cookies);
     }
 }

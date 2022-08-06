@@ -13,5 +13,6 @@ public class OAuth2Properties {
     
     private List<String> authorizedRedirectUris;
     
-    private String defaultCompleteUrl;
+    private String defaultRedirectUri;
+    
 }

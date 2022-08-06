@@ -5,16 +5,11 @@ import com.server.bitwit.domain.Authority;
 import com.server.bitwit.infra.client.google.dto.GoogleUser;
 import com.server.bitwit.infra.storage.StorageService;
 import com.server.bitwit.module.account.AccountRepository;
-import com.server.bitwit.module.error.exception.BitwitException;
-import com.server.bitwit.module.error.exception.ErrorCode;
-import com.server.bitwit.util.StringUtils;
+import com.server.bitwit.util.ImageRestTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.stream.Collectors;
 
 import static com.server.bitwit.domain.AccountType.GOOGLE;
 
@@ -32,7 +27,7 @@ public class GoogleUserService {
         var authorities = account.getAuthorities( ).stream( )
                                  .map(Authority::getAuthorityName)
                                  .map(SimpleGrantedAuthority::new)
-                                 .collect(Collectors.toList( ));
+                                 .toList( );
         
         return new GoogleLoginAuthenticationToken(principal, authorities);
     }
@@ -46,20 +41,9 @@ public class GoogleUserService {
     }
     
     private Account createGoogleAccount(GoogleUser googleUser) {
-        var response     = new RestTemplate( ).getForEntity(googleUser.getPicture( ), byte[].class);
-        var fileName     = StringUtils.getLastElement(googleUser.getPicture( ), "/");
-        var extension    = getImageFileExtension(response.getHeaders( ).getContentType( ).toString( ));
-        var imageContent = response.getBody( );
-        var uploadFile   = storageService.upload(fileName + "." + extension, imageContent);
+        var profileImage = new ImageRestTemplate(googleUser.getPicture( )).getImage( );
+        var uploadFile   = storageService.upload(profileImage.name( ), profileImage.content( ));
         return Account.createOAuthAccount(googleUser.getName( ), googleUser.getEmail( ), GOOGLE)
                       .changeProfileImage(uploadFile);
-    }
-    
-    private String getImageFileExtension(String contentType) {
-        String[] split = contentType.split("/");
-        if (! split[0].equals("image")) {
-            throw new BitwitException(ErrorCode.FIELD_ERROR, "Not an image: " + contentType);
-        }
-        return split[1];
     }
 }

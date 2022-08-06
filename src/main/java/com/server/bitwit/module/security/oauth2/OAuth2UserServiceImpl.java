@@ -1,9 +1,11 @@
 package com.server.bitwit.module.security.oauth2;
 
-import com.server.bitwit.module.security.oauth2.attributes.OAuth2Attributes;
-import com.server.bitwit.module.account.AccountRepository;
 import com.server.bitwit.domain.Account;
 import com.server.bitwit.domain.Authority;
+import com.server.bitwit.infra.storage.StorageService;
+import com.server.bitwit.module.account.AccountRepository;
+import com.server.bitwit.module.security.oauth2.attributes.OAuth2Attributes;
+import com.server.bitwit.util.ImageRestTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     
     private final AccountRepository accountRepository;
+    
+    private final StorageService storageService;
     
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
@@ -51,7 +55,13 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         var account = accountRepository.findByEmailAndAccountType(attributes.getEmail( ), attributes.getAccountType( ))
                                        .map(_account -> _account.changeName(attributes.getName( )))
                                        .map(_account -> _account.changeEmail(attributes.getEmail( )))
-                                       .orElse(attributes.toAccount( ));
+                                       .orElse(createOAuthAccount(attributes));
         return accountRepository.save(account);
+    }
+    
+    private Account createOAuthAccount(OAuth2Attributes attributes) {
+        var profileImage = new ImageRestTemplate(attributes.getPicture( )).getImage( );
+        var uploadFile   = storageService.upload(profileImage.name( ), profileImage.content( ));
+        return attributes.toAccount( ).changeProfileImage(uploadFile);
     }
 }
