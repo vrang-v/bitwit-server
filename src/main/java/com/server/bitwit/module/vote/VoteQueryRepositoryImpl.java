@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static com.server.bitwit.domain.QAccount.account;
 import static com.server.bitwit.domain.QBallot.ballot;
+import static com.server.bitwit.domain.QStock.stock;
 import static com.server.bitwit.domain.QVote.vote;
 import static com.server.bitwit.util.DynamicQueryUtils.combineWithOr;
 import static com.server.bitwit.util.DynamicQueryUtils.in;
@@ -46,7 +47,7 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     public List<Vote> findActiveVotes( ) {
         var now = now( );
         return selectFrom(vote)
-                .leftJoin(vote.stock).fetchJoin( )
+                .leftJoin(vote.stock, stock).fetchJoin( )
                 .where(
                         vote.startAt.before(now),
                         vote.endedAt.after(now)
@@ -57,7 +58,7 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     @Override
     public List<Vote> searchAllParticipated(VoteSearchCond cond) {
         return selectFrom(vote)
-                .innerJoin(vote.stock).fetchJoin( )
+                .innerJoin(vote.stock, stock).fetchJoin( )
                 .innerJoin(vote.ballots, ballot)
                 .where(
                         ballot.account.id.eq(cond.getAccountId( )),
@@ -73,9 +74,9 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     
     @Override
     public List<Vote> searchAllNotParticipated(VoteSearchCond cond) {
-        var _vote = new QVote("sub");
-        var participatedVotes = selectFrom(_vote)
-                .innerJoin(_vote.ballots, ballot)
+        var subVote = new QVote("sub");
+        var participatedVotes = selectFrom(subVote)
+                .innerJoin(subVote.ballots, ballot)
                 .where(ballot.account.id.eq(cond.getAccountId( )));
         return selectFrom(vote)
                 .innerJoin(vote.stock).fetchJoin( )
@@ -95,7 +96,8 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     public Page<Vote> searchActiveVotePage(VoteSearchCond cond, Pageable pageable, LocalDateTime currentTime) {
         return paginate(pageable,
                 selectFrom(vote)
-                        .innerJoin(vote.stock).fetchJoin( )
+                        .distinct( )
+                        .innerJoin(vote.stock, stock).fetchJoin( )
                         .leftJoin(vote.ballots, ballot)
                         .where(
                                 combineWithOr(
@@ -112,7 +114,8 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     @Override
     public List<Vote> searchAllActiveVotesParticipated(VoteSearchCond cond, LocalDateTime currentTime) {
         return selectFrom(vote)
-                .innerJoin(vote.stock).fetchJoin( )
+                .distinct( )
+                .innerJoin(vote.stock, stock).fetchJoin( )
                 .innerJoin(vote.ballots, ballot)
                 .where(
                         ballot.account.id.eq(cond.getAccountId( )),
@@ -130,7 +133,8 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
     @Override
     public List<Vote> searchActiveVoteWithOffset(VoteSearchCond cond, Sort sort, int offset, int limit, LocalDateTime currentTime) {
         JPQLQuery<Vote> query = selectFrom(vote)
-                .innerJoin(vote.stock).fetchJoin( )
+                .distinct( )
+                .innerJoin(vote.stock, stock).fetchJoin( )
                 .leftJoin(vote.ballots, ballot)
                 .where(
                         combineWithOr(
@@ -154,7 +158,7 @@ public class VoteQueryRepositoryImpl extends QuerydslRepositoryBase implements V
         var from = date.atStartOfDay( ).toInstant(ZoneOffset.UTC);
         var to   = from.plus(1, ChronoUnit.DAYS);
         return selectFrom(vote)
-                .leftJoin(vote.stock).fetchJoin( )
+                .leftJoin(vote.stock, stock).fetchJoin( )
                 .leftJoin(vote.ballots, ballot)
                 .leftJoin(ballot.account, account)
                 .where(
