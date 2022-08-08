@@ -20,6 +20,11 @@ class GoogleCloudStorageServiceTest {
     @Autowired GoogleCloudStorageService storageService;
     
     @Test
+    void existGoogleApplicationCredentialsEnvVariable( ) {
+        assertThat(System.getenv("GOOGLE_APPLICATION_CREDENTIALS")).isNotNull( );
+    }
+    
+    @Test
     void transaction( ) throws IOException {
         // given
         var fileName = "test.txt";
