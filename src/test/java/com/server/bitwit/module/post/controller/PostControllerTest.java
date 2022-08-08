@@ -2,6 +2,8 @@ package com.server.bitwit.module.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.bitwit.module.post.dto.CreatePostRequest;
+import com.server.bitwit.module.stock.StockService;
+import com.server.bitwit.module.stock.dto.CreateStockRequest;
 import com.server.bitwit.util.MockJwt;
 import com.server.bitwit.util.MockMvcTest;
 import com.server.bitwit.util.WithMockAccount;
@@ -26,6 +28,8 @@ class PostControllerTest {
     @Autowired MockMvc      mockMvc;
     @Autowired MockJwt      mockJwt;
     @Autowired ObjectMapper objectMapper;
+    
+    @Autowired StockService stockService;
     
     @Test
     @WithMockAccount
@@ -53,10 +57,12 @@ class PostControllerTest {
     @WithMockAccount
     void createPost_withStock( ) throws Exception {
         // given
+        var stock   = stockService.createStock(new CreateStockRequest("AAPL", "Apple.inc", "애플"));
+        
         var request = new CreatePostRequest( );
         request.setTitle("제목입니다");
         request.setContent("내용입니다");
-        request.setTickers(List.of("BTC"));
+        request.setTickers(List.of(stock.getTicker( )));
         
         // then
         mockMvc.perform(post("/api/posts")
@@ -69,7 +75,7 @@ class PostControllerTest {
                        jsonPath("$.postId").exists( ),
                        jsonPath("$.title").value("제목입니다"),
                        jsonPath("$.content").value("내용입니다"),
-                       jsonPath("$.stocks[0].ticker").value("BTC")
+                       jsonPath("$.stocks[0].ticker").value(stock.getTicker( ))
                );
     }
     

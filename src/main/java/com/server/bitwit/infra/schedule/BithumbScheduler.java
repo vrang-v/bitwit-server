@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Profile("!test")
+@Profile({"!test & !debug"})
 public class BithumbScheduler {
     
     private final BithumbService bithumbService;

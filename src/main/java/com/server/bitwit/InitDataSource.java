@@ -1,6 +1,7 @@
 package com.server.bitwit;
 
 import com.server.bitwit.domain.Stock;
+import com.server.bitwit.infra.schedule.VoteCreationScheduler;
 import com.server.bitwit.module.stock.StockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@Profile({"!local"})
+@Profile({"prod"})
 public class InitDataSource {
     
-    private final StockRepository   stockRepository;
+    private final StockRepository stockRepository;
+    
+    private final VoteCreationScheduler voteCreationScheduler;
     
     @EventListener(ApplicationReadyEvent.class)
     public void init( ) throws IOException {
@@ -42,6 +45,10 @@ public class InitDataSource {
                    .map(line -> line.split(","))
                    .map(split -> Stock.createStock(split[0].trim( ), "", split[1].trim( )))
                    .forEach(stockRepository::save);
+            voteCreationScheduler.createDailyVotes( );
         }
+    
+        log.info("Finish Init Stock");
+    
     }
 }

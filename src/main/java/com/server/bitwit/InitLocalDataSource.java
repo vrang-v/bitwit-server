@@ -63,9 +63,9 @@ public class InitLocalDataSource {
         for (int i = 0; i < 100; i++) {
             var btc   = stockRepository.findByTicker("BTC").orElseThrow( );
             var eth   = stockRepository.findByTicker("ETH").orElseThrow( );
-            var post1 = new Post("비트코인 떡상" + i, "Hello", account1).addStock(btc).addStock(eth);
-            var post2 = new Post("비트코인 떡락" + i, "Hello", account1).addStock(btc);
-            var post3 = new Post("이더리움 떡상" + i, "Hello", account1).addStock(eth);
+            var post1 = new Post("안녕하세요!!! " + i, "Hello", account1).addStock(btc).addStock(eth);
+            var post2 = new Post("Apple September event: iPhone 14, Apple Watch Series 8, iOS 16 release date, and more" + i, "Hello", account1).addStock(btc);
+            var post3 = new Post("분기매출 2조 돌파한 네이버…\"웹툰 수익화 이제 시작\"" + i, "Hello", account1).addStock(eth);
             postRepository.save(post1);
             postRepository.save(post2);
             postRepository.save(post3);
