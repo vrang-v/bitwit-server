@@ -1,6 +1,7 @@
 package com.server.bitwit.module.security.google;
 
 import com.server.bitwit.infra.client.google.dto.GoogleUser;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,11 +9,12 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class GoogleLoginAuthenticationToken extends AbstractAuthenticationToken {
     
-    private GoogleUser googleUser;
+    private transient GoogleUser googleUser;
     
-    private GoogleLoginPrincipal principal;
+    private transient GoogleLoginPrincipal principal;
     
     public GoogleLoginAuthenticationToken(GoogleUser googleUser) {
         super(null);

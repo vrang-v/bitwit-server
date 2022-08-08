@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class GoogleUser {
-    
+  
     private String iss;
     private String azp;
     private String aud;

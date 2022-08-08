@@ -1,18 +1,16 @@
 package com.server.bitwit.module.security.basic;
 
-import com.server.bitwit.domain.AccountType;
-import com.server.bitwit.module.error.exception.NotFoundException;
-import com.server.bitwit.module.account.AccountRepository;
 import com.server.bitwit.domain.Account;
+import com.server.bitwit.domain.AccountType;
 import com.server.bitwit.domain.Authority;
+import com.server.bitwit.module.account.AccountRepository;
+import com.server.bitwit.module.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -31,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         var authorities = account.getAuthorities( ).stream( )
                                  .map(Authority::getAuthorityName)
                                  .map(SimpleGrantedAuthority::new)
-                                 .collect(Collectors.toList( ));
+                                 .toList( );
         
         return new UserDetailsPrincipal(account, authorities);
     }

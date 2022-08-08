@@ -1,13 +1,10 @@
 package com.server.bitwit.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class PageUtils {
+public interface PageUtils {
     
-    public static Sort getSort(String sort) {
+    static Sort getSort(String sort) {
         if (sort == null) {
             return null;
         }
@@ -15,14 +12,11 @@ public abstract class PageUtils {
         if (split.length != 2) {
             throw new IllegalArgumentException("Invalid sort parameter : " + sort);
         }
-        switch (split[1]) {
-            case "asc":
-                return Sort.by(Sort.Direction.ASC, split[0]);
-            case "desc":
-                return Sort.by(Sort.Direction.DESC, split[0]);
-            default:
-                throw new IllegalArgumentException("Invalid sort parameter : " + sort);
-        }
+        return switch (split[1]) {
+            case "asc" -> Sort.by(Sort.Direction.ASC, split[0]);
+            case "desc" -> Sort.by(Sort.Direction.DESC, split[0]);
+            default -> throw new IllegalArgumentException("Invalid sort parameter : " + sort);
+        };
     }
     
 }

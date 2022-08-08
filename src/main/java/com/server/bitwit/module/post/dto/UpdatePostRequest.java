@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +27,6 @@ public class UpdatePostRequest {
     }
     
     public void distinctTickers( ) {
-        tickers = tickers.stream( ).distinct( ).collect(Collectors.toList( ));
+        tickers = tickers.stream( ).distinct( ).toList( );
     }
 }
